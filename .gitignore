@@ -1,0 +1,21 @@
+## Maven
+**/target/
+target/
+
+## IDE
+.vscode/
+.idea/
+*.iml
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Node (if/when frontend is added)
+node_modules/
+dist/
+build/
+
+## Secrets / env files
+.env
+.env.*
