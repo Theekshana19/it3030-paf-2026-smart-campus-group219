@@ -7,7 +7,7 @@
 - Maven
 - SQL Server running locally
 - Database name: `SmartCampusDB`
-- User: `sa` (see `backend/src/main/resources/application.properties` for the configured password)
+- Environment variables: `DB_USERNAME`, `DB_PASSWORD`
 
 ### Run the backend
 From the repository root:
@@ -24,8 +24,15 @@ GET http://localhost:8080/api/resources/test-db
 
 Expected response (example):
 ```json
-{ "connected": true, "databaseName": "SmartCampusDB" }
+{ "connected": true, "module": "Member 1 Resources" }
 ```
 
 ### Notes
 - `spring.jpa.hibernate.ddl-auto=none` is set because tables are expected to be created by your migration/DDL SQL (as required by the assignment).
+
+## Member 1 Day 1 Foundation
+- Member 1 backend foundation initialized.
+- SQL Server connection configured for `SmartCampusDB`.
+- Layered architecture package scaffold created under `lk.sliit.smartcampus`.
+- Enum skeletons added for resource module status/type modeling.
+- DB connectivity test endpoint added at `GET /api/resources/test-db`.
