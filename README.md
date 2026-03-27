@@ -9,6 +9,17 @@
 - Database name: `SmartCampusDB`
 - Environment variables: `DB_USERNAME`, `DB_PASSWORD`
 
+### Configure environment variables
+Set these before starting the backend:
+- `DB_USERNAME` = your SQL Server username
+- `DB_PASSWORD` = your SQL Server password
+
+PowerShell example:
+```powershell
+$env:DB_USERNAME="sa"
+$env:DB_PASSWORD="your_password"
+```
+
 ### Run the backend
 From the repository root:
 ```bash
@@ -30,9 +41,29 @@ Expected response (example):
 ### Notes
 - `spring.jpa.hibernate.ddl-auto=none` is set because tables are expected to be created by your migration/DDL SQL (as required by the assignment).
 
-## Member 1 Day 1 Foundation
-- Member 1 backend foundation initialized.
-- SQL Server connection configured for `SmartCampusDB`.
-- Layered architecture package scaffold created under `lk.sliit.smartcampus`.
-- Enum skeletons added for resource module status/type modeling.
-- DB connectivity test endpoint added at `GET /api/resources/test-db`.
+### Resource module API endpoints
+
+Resources:
+- `POST /api/resources`
+- `GET /api/resources`
+- `GET /api/resources/{resourceId}`
+- `PUT /api/resources/{resourceId}`
+- `DELETE /api/resources/{resourceId}`
+- `GET /api/resources/test-db`
+
+Resource tags:
+- `POST /api/resource-tags`
+- `GET /api/resource-tags`
+- `GET /api/resource-tags/{tagId}`
+- `PUT /api/resource-tags/{tagId}`
+- `DELETE /api/resource-tags/{tagId}`
+
+Resource-tag mapping:
+- `POST /api/resources/{resourceId}/tags/{tagId}`
+- `DELETE /api/resources/{resourceId}/tags/{tagId}`
+
+Resource status schedules:
+- `POST /api/resources/{resourceId}/status-schedules`
+- `GET /api/resources/{resourceId}/status-schedules`
+- `PUT /api/resources/{resourceId}/status-schedules/{scheduleId}`
+- `DELETE /api/resources/{resourceId}/status-schedules/{scheduleId}`
