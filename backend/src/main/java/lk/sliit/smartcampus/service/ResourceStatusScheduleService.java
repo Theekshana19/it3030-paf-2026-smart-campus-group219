@@ -12,6 +12,8 @@ public interface ResourceStatusScheduleService {
 
   List<ResourceStatusScheduleResponse> findByResource(Long resourceId);
 
+  ResourceStatusScheduleResponse getById(Long resourceId, Long scheduleId);
+
   ResourceStatusScheduleResponse update(
       Long resourceId, Long scheduleId, ResourceStatusScheduleUpdateRequest request);
 

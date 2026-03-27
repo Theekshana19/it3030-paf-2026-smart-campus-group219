@@ -42,6 +42,12 @@ public class ResourceStatusScheduleController {
     return resourceStatusScheduleService.findByResource(resourceId);
   }
 
+  @GetMapping("/{scheduleId}")
+  public ResourceStatusScheduleResponse getById(
+      @PathVariable Long resourceId, @PathVariable Long scheduleId) {
+    return resourceStatusScheduleService.getById(resourceId, scheduleId);
+  }
+
   @PutMapping("/{scheduleId}")
   public ResourceStatusScheduleResponse update(
       @PathVariable Long resourceId,

@@ -68,6 +68,7 @@ Resource-tag mapping:
 Resource status schedules:
 - `POST /api/resources/{resourceId}/status-schedules`
 - `GET /api/resources/{resourceId}/status-schedules`
+- `GET /api/resources/{resourceId}/status-schedules/{scheduleId}`
 - `PUT /api/resources/{resourceId}/status-schedules/{scheduleId}`
 - `DELETE /api/resources/{resourceId}/status-schedules/{scheduleId}`
 

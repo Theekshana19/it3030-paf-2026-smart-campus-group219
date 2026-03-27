@@ -60,6 +60,13 @@ public class ResourceStatusScheduleServiceImpl implements ResourceStatusSchedule
   }
 
   @Override
+  @Transactional(readOnly = true)
+  public ResourceStatusScheduleResponse getById(Long resourceId, Long scheduleId) {
+    ResourceStatusSchedule entity = loadSchedule(resourceId, scheduleId);
+    return resourceStatusScheduleMapper.toResponse(entity);
+  }
+
+  @Override
   public ResourceStatusScheduleResponse update(
       Long resourceId, Long scheduleId, ResourceStatusScheduleUpdateRequest request) {
     ResourceStatusSchedule entity = loadSchedule(resourceId, scheduleId);

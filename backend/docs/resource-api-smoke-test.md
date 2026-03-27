@@ -60,6 +60,12 @@ $schedule
 
 Save `schedule.scheduleId`.
 
+Read single schedule:
+
+```powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources/$($resource.resourceId)/status-schedules/$($schedule.scheduleId)"
+```
+
 ## 6) Read resources list and single resource
 
 ```powershell
