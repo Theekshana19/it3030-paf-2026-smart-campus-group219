@@ -3,6 +3,7 @@ package lk.sliit.smartcampus.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import lk.sliit.smartcampus.dto.request.ResourceCreateRequest;
 import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
@@ -24,6 +25,10 @@ import lk.sliit.smartcampus.service.ResourceService;
 import lk.sliit.smartcampus.service.SmartAvailabilityService;
 import lk.sliit.smartcampus.service.SmartAvailabilitySnapshot;
 import lk.sliit.smartcampus.util.ResourceSpecifications;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +36,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ResourceServiceImpl implements ResourceService {
+
+  private static final Set<String> ALLOWED_SORT_FIELDS =
+      Set.of(
+          "resourceId",
+          "resourceCode",
+          "resourceName",
+          "resourceType",
+          "building",
+          "floor",
+          "capacity",
+          "status",
+          "createdAt",
+          "updatedAt");
 
   private final ResourceRepository resourceRepository;
   private final ResourceTagMappingRepository resourceTagMappingRepository;
@@ -104,15 +122,28 @@ public class ResourceServiceImpl implements ResourceService {
       String building,
       ResourceStatus status,
       String tag,
-      String search) {
+      String search,
+      Integer page,
+      Integer size,
+      String sortBy,
+      String sortDir) {
 
     Specification<Resource> spec =
         ResourceSpecifications.filter(type, minCapacity, building, status, tag, search);
-    List<Resource> resources = resourceRepository.findAll(spec);
-    List<ResourceResponse> items = resources.stream().map(this::mapToResponse).toList();
+    String resolvedSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "resourceId";
+    Sort sort =
+        "desc".equalsIgnoreCase(sortDir)
+            ? Sort.by(resolvedSortBy).descending()
+            : Sort.by(resolvedSortBy).ascending();
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<Resource> resourcePage = resourceRepository.findAll(spec, pageable);
+    List<ResourceResponse> items = resourcePage.getContent().stream().map(this::mapToResponse).toList();
     return ResourceListResponse.builder()
         .items(items)
-        .totalItems((long) items.size())
+        .totalItems(resourcePage.getTotalElements())
+        .page(resourcePage.getNumber())
+        .size(resourcePage.getSize())
+        .totalPages(resourcePage.getTotalPages())
         .build();
   }
 

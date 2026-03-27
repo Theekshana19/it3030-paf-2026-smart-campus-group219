@@ -50,6 +50,7 @@ Resources:
 - `PUT /api/resources/{resourceId}`
 - `DELETE /api/resources/{resourceId}`
 - `GET /api/resources/test-db`
+- List supports query params: `type`, `minCapacity`, `building`, `status`, `tag`, `search`, `page`, `size`, `sortBy`, `sortDir`
 
 Resource tags:
 - `POST /api/resource-tags`

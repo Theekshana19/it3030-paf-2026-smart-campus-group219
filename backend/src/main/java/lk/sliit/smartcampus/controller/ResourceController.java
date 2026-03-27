@@ -13,6 +13,7 @@ import lk.sliit.smartcampus.service.ResourceTagMappingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,8 +60,26 @@ public class ResourceController {
       @RequestParam(required = false) String building,
       @RequestParam(required = false) ResourceStatus status,
       @RequestParam(required = false) String tag,
-      @RequestParam(required = false) String search) {
-    return resourceService.findAll(type, minCapacity, building, status, tag, search);
+      @RequestParam(required = false) String search,
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "10") Integer size,
+      @RequestParam(defaultValue = "resourceId") String sortBy,
+      @RequestParam(defaultValue = "asc") String sortDir) {
+    int sanitizedPage = Math.max(page, 0);
+    int sanitizedSize = Math.max(size, 1);
+    String sanitizedSortBy = StringUtils.hasText(sortBy) ? sortBy : "resourceId";
+    String sanitizedSortDir = "desc".equalsIgnoreCase(sortDir) ? "desc" : "asc";
+    return resourceService.findAll(
+        type,
+        minCapacity,
+        building,
+        status,
+        tag,
+        search,
+        sanitizedPage,
+        sanitizedSize,
+        sanitizedSortBy,
+        sanitizedSortDir);
   }
 
   @GetMapping("/{id}")

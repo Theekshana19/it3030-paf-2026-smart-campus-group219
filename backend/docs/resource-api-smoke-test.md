@@ -73,6 +73,12 @@ Optional filters:
 Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?resourceType=LAB&building=B2&minCapacity=20&status=AVAILABLE&tag=Projector&search=Lab"
 ```
 
+Pagination + sorting example:
+
+```powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?page=0&size=5&sortBy=resourceCode&sortDir=asc"
+```
+
 ## 7) Update tag and schedule
 
 ```powershell

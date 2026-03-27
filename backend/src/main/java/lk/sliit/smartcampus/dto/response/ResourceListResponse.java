@@ -10,5 +10,8 @@ public class ResourceListResponse {
 
   private List<ResourceResponse> items;
   private Long totalItems;
+  private Integer page;
+  private Integer size;
+  private Integer totalPages;
 }
 

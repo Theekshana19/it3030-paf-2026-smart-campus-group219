@@ -23,5 +23,9 @@ public interface ResourceService {
       String building,
       ResourceStatus status,
       String tag,
-      String search);
+      String search,
+      Integer page,
+      Integer size,
+      String sortBy,
+      String sortDir);
 }
