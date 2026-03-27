@@ -85,6 +85,16 @@ Validation note:
 - `sortDir` must be `asc` or `desc`
 - `sortBy` must be one of: `resourceId`, `resourceCode`, `resourceName`, `resourceType`, `building`, `floor`, `capacity`, `status`, `createdAt`, `updatedAt`
 
+Negative checks (expected `400 Bad Request`):
+
+```powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?page=-1"
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?size=0"
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?size=101"
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?sortDir=down"
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?sortBy=invalidField"
+```
+
 ## 7) Update tag and schedule
 
 ```powershell
