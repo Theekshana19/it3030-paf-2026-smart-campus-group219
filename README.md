@@ -67,3 +67,6 @@ Resource status schedules:
 - `GET /api/resources/{resourceId}/status-schedules`
 - `PUT /api/resources/{resourceId}/status-schedules/{scheduleId}`
 - `DELETE /api/resources/{resourceId}/status-schedules/{scheduleId}`
+
+### API smoke test guide
+- Quick PowerShell checklist: `backend/docs/resource-api-smoke-test.md`
