@@ -1,11 +1,13 @@
 package lk.sliit.smartcampus.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import lk.sliit.smartcampus.dto.request.ResourceCreateRequest;
 import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
 import lk.sliit.smartcampus.dto.response.ResourceResponse;
+import lk.sliit.smartcampus.dto.response.ResourceTagResponse;
 import lk.sliit.smartcampus.enums.ResourceStatus;
 import lk.sliit.smartcampus.enums.ResourceType;
 import lk.sliit.smartcampus.service.ResourceService;
@@ -108,6 +110,11 @@ public class ResourceController {
       @PathVariable Long resourceId, @PathVariable Long tagId) {
     resourceTagMappingService.addTagToResource(resourceId, tagId);
     return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  @GetMapping("/{resourceId}/tags")
+  public List<ResourceTagResponse> listTagsByResource(@PathVariable Long resourceId) {
+    return resourceTagMappingService.findTagsByResource(resourceId);
   }
 
   @DeleteMapping("/{resourceId}/tags/{tagId}")
