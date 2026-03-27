@@ -33,6 +33,14 @@ public class ResourceTagServiceImpl implements ResourceTagService {
   }
 
   @Override
+  @Transactional(readOnly = true)
+  public ResourceTagResponse getById(Long tagId) {
+    ResourceTag entity =
+        resourceTagRepository.findById(tagId).orElseThrow(() -> new TagNotFoundException(tagId));
+    return resourceTagMapper.toResponse(entity);
+  }
+
+  @Override
   public ResourceTagResponse create(ResourceTagCreateRequest request) {
     if (resourceTagRepository.existsByTagNameIgnoreCase(request.getTagName())) {
       throw new IllegalArgumentException("Tag name already exists: " + request.getTagName());

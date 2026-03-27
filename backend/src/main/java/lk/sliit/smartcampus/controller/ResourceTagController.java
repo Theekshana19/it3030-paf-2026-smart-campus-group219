@@ -32,6 +32,11 @@ public class ResourceTagController {
     return resourceTagService.findAll();
   }
 
+  @GetMapping("/{id}")
+  public ResourceTagResponse getById(@PathVariable Long id) {
+    return resourceTagService.getById(id);
+  }
+
   @PostMapping
   public ResponseEntity<ResourceTagResponse> create(
       @Valid @RequestBody ResourceTagCreateRequest request) {

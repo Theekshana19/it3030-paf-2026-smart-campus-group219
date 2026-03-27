@@ -9,6 +9,8 @@ public interface ResourceTagService {
 
   List<ResourceTagResponse> findAll();
 
+  ResourceTagResponse getById(Long tagId);
+
   ResourceTagResponse create(ResourceTagCreateRequest request);
 
   ResourceTagResponse update(Long tagId, ResourceTagUpdateRequest request);
