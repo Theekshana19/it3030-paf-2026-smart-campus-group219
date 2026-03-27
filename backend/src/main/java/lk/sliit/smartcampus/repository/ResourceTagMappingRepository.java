@@ -10,6 +10,8 @@ public interface ResourceTagMappingRepository extends JpaRepository<ResourceTagM
 
   void deleteByResource_ResourceIdAndTag_TagId(Long resourceId, Long tagId);
 
+  void deleteByResource_ResourceId(Long resourceId);
+
   List<ResourceTagMapping> findByResource_ResourceId(Long resourceId);
 
   List<ResourceTagMapping> findByTag_TagId(Long tagId);

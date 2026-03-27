@@ -13,4 +13,6 @@ public interface ResourceStatusScheduleRepository
 
   List<ResourceStatusSchedule> findByResource_ResourceIdAndScheduleDate(
       Long resourceId, LocalDate scheduleDate);
+
+  void deleteByResource_ResourceId(Long resourceId);
 }

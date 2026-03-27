@@ -1,6 +1,7 @@
 package lk.sliit.smartcampus.mapper;
 
 import lk.sliit.smartcampus.dto.request.ResourceTagCreateRequest;
+import lk.sliit.smartcampus.dto.request.ResourceTagUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceTagResponse;
 import lk.sliit.smartcampus.entity.ResourceTag;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,13 @@ public class ResourceTagMapper {
   }
 
   public void apply(ResourceTag entity, ResourceTagCreateRequest request) {
+    entity.setTagName(request.getTagName().trim());
+    entity.setTagColor(request.getTagColor());
+    entity.setDescription(request.getDescription());
+    entity.setIsActive(request.getIsActive());
+  }
+
+  public void apply(ResourceTag entity, ResourceTagUpdateRequest request) {
     entity.setTagName(request.getTagName().trim());
     entity.setTagColor(request.getTagColor());
     entity.setDescription(request.getDescription());

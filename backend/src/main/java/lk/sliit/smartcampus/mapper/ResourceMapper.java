@@ -55,6 +55,15 @@ public class ResourceMapper {
   }
 
   public ResourceResponse toResponse(Resource entity, List<ResourceTagResponse> tags) {
+    return toResponse(entity, tags, null, null, null);
+  }
+
+  public ResourceResponse toResponse(
+      Resource entity,
+      List<ResourceTagResponse> tags,
+      String smartAvailabilityStatus,
+      String nextBookingTime,
+      Integer todayBookingCount) {
     List<ResourceTagResponse> safeTags = tags == null ? Collections.emptyList() : tags;
     return ResourceResponse.builder()
         .resourceId(entity.getResourceId())
@@ -75,9 +84,9 @@ public class ResourceMapper {
         .isActive(entity.getIsActive())
         .createdAt(entity.getCreatedAt())
         .updatedAt(entity.getUpdatedAt())
-        .smartAvailabilityStatus(null)
-        .nextBookingTime(null)
-        .todayBookingCount(null)
+        .smartAvailabilityStatus(smartAvailabilityStatus)
+        .nextBookingTime(nextBookingTime)
+        .todayBookingCount(todayBookingCount)
         .tags(safeTags)
         .build();
   }

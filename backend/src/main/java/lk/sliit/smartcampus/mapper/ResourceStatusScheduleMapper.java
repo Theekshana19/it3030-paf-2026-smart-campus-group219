@@ -1,6 +1,7 @@
 package lk.sliit.smartcampus.mapper;
 
 import lk.sliit.smartcampus.dto.request.ResourceStatusScheduleCreateRequest;
+import lk.sliit.smartcampus.dto.request.ResourceStatusScheduleUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceStatusScheduleResponse;
 import lk.sliit.smartcampus.entity.Resource;
 import lk.sliit.smartcampus.entity.ResourceStatusSchedule;
@@ -24,6 +25,16 @@ public class ResourceStatusScheduleMapper {
 
   public void apply(
       ResourceStatusSchedule entity, ResourceStatusScheduleCreateRequest request) {
+    entity.setScheduleDate(request.getScheduleDate());
+    entity.setStartTime(request.getStartTime());
+    entity.setEndTime(request.getEndTime());
+    entity.setScheduledStatus(request.getScheduledStatus());
+    entity.setReasonNote(request.getReasonNote());
+    entity.setIsActive(request.getIsActive());
+  }
+
+  public void apply(
+      ResourceStatusSchedule entity, ResourceStatusScheduleUpdateRequest request) {
     entity.setScheduleDate(request.getScheduleDate());
     entity.setStartTime(request.getStartTime());
     entity.setEndTime(request.getEndTime());

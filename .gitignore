@@ -19,3 +19,6 @@ build/
 ## Secrets / env files
 .env
 .env.*
+
+## Local run logs
+backend/server-*.log

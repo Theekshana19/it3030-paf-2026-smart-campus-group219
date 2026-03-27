@@ -1,0 +1,64 @@
+package lk.sliit.smartcampus.service;
+
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import lk.sliit.smartcampus.entity.Resource;
+import lk.sliit.smartcampus.entity.ResourceStatusSchedule;
+import lk.sliit.smartcampus.enums.ResourceStatus;
+import lk.sliit.smartcampus.enums.ScheduledStatus;
+import lk.sliit.smartcampus.enums.SmartAvailabilityStatus;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SmartAvailabilityService {
+
+  private static final int BUSY_SOON_WINDOW_MINUTES = 120;
+
+  /**
+   * Computes availability for UI. Booking module integration can plug in
+   * {@code todayBookingCount} and refine FULLY_BOOKED_TODAY later.
+   */
+  public SmartAvailabilitySnapshot compute(
+      Resource resource, List<ResourceStatusSchedule> schedulesForToday) {
+
+    if (resource.getStatus() == ResourceStatus.OUT_OF_SERVICE) {
+      return new SmartAvailabilitySnapshot(
+          SmartAvailabilityStatus.OUT_OF_SERVICE.name(), null, null);
+    }
+
+    boolean hasOutOfServiceSchedule =
+        schedulesForToday.stream()
+            .anyMatch(
+                s ->
+                    Boolean.TRUE.equals(s.getIsActive())
+                        && s.getScheduledStatus() == ScheduledStatus.OUT_OF_SERVICE);
+
+    if (hasOutOfServiceSchedule) {
+      return new SmartAvailabilitySnapshot(
+          SmartAvailabilityStatus.OUT_OF_SERVICE.name(), null, null);
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+
+    LocalDateTime nextStart =
+        schedulesForToday.stream()
+            .filter(s -> Boolean.TRUE.equals(s.getIsActive()))
+            .filter(s -> s.getScheduledStatus() == ScheduledStatus.ACTIVE)
+            .map(s -> LocalDateTime.of(s.getScheduleDate(), s.getStartTime()))
+            .filter(dt -> dt.isAfter(now))
+            .min(Comparator.naturalOrder())
+            .orElse(null);
+
+    if (nextStart != null
+        && java.time.Duration.between(now, nextStart).toMinutes() <= BUSY_SOON_WINDOW_MINUTES) {
+      return new SmartAvailabilitySnapshot(
+          SmartAvailabilityStatus.BUSY_SOON.name(),
+          nextStart.toLocalTime().toString(),
+          null);
+    }
+
+    return new SmartAvailabilitySnapshot(
+        SmartAvailabilityStatus.AVAILABLE_NOW.name(), null, null);
+  }
+}
