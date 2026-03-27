@@ -79,6 +79,10 @@ Pagination + sorting example:
 Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?page=0&size=5&sortBy=resourceCode&sortDir=asc"
 ```
 
+Validation note:
+- `page` must be `0` or higher
+- `size` must be between `1` and `100`
+
 ## 7) Update tag and schedule
 
 ```powershell

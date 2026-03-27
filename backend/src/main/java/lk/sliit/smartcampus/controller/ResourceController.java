@@ -65,8 +65,12 @@ public class ResourceController {
       @RequestParam(defaultValue = "10") Integer size,
       @RequestParam(defaultValue = "resourceId") String sortBy,
       @RequestParam(defaultValue = "asc") String sortDir) {
-    int sanitizedPage = Math.max(page, 0);
-    int sanitizedSize = Math.max(size, 1);
+    if (page < 0) {
+      throw new IllegalArgumentException("page must be greater than or equal to 0");
+    }
+    if (size < 1 || size > 100) {
+      throw new IllegalArgumentException("size must be between 1 and 100");
+    }
     String sanitizedSortBy = StringUtils.hasText(sortBy) ? sortBy : "resourceId";
     String sanitizedSortDir = "desc".equalsIgnoreCase(sortDir) ? "desc" : "asc";
     return resourceService.findAll(
@@ -76,8 +80,8 @@ public class ResourceController {
         status,
         tag,
         search,
-        sanitizedPage,
-        sanitizedSize,
+        page,
+        size,
         sanitizedSortBy,
         sanitizedSortDir);
   }

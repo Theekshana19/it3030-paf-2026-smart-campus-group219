@@ -51,6 +51,7 @@ Resources:
 - `DELETE /api/resources/{resourceId}`
 - `GET /api/resources/test-db`
 - List supports query params: `type`, `minCapacity`, `building`, `status`, `tag`, `search`, `page`, `size`, `sortBy`, `sortDir`
+- Pagination validation: `page >= 0`, `size` must be between `1` and `100` (invalid values return `400 Bad Request`)
 
 Resource tags:
 - `POST /api/resource-tags`
