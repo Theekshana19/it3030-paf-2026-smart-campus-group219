@@ -82,6 +82,8 @@ Invoke-RestMethod -Method GET -Uri "http://localhost:8080/api/resources?page=0&s
 Validation note:
 - `page` must be `0` or higher
 - `size` must be between `1` and `100`
+- `sortDir` must be `asc` or `desc`
+- `sortBy` must be one of: `resourceId`, `resourceCode`, `resourceName`, `resourceType`, `building`, `floor`, `capacity`, `status`, `createdAt`, `updatedAt`
 
 ## 7) Update tag and schedule
 

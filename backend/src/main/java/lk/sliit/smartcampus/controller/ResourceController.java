@@ -13,7 +13,6 @@ import lk.sliit.smartcampus.service.ResourceTagMappingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,8 +70,9 @@ public class ResourceController {
     if (size < 1 || size > 100) {
       throw new IllegalArgumentException("size must be between 1 and 100");
     }
-    String sanitizedSortBy = StringUtils.hasText(sortBy) ? sortBy : "resourceId";
-    String sanitizedSortDir = "desc".equalsIgnoreCase(sortDir) ? "desc" : "asc";
+    if (!"asc".equalsIgnoreCase(sortDir) && !"desc".equalsIgnoreCase(sortDir)) {
+      throw new IllegalArgumentException("sortDir must be either 'asc' or 'desc'");
+    }
     return resourceService.findAll(
         type,
         minCapacity,
@@ -82,8 +82,8 @@ public class ResourceController {
         search,
         page,
         size,
-        sanitizedSortBy,
-        sanitizedSortDir);
+        sortBy,
+        sortDir);
   }
 
   @GetMapping("/{id}")

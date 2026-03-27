@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import org.springframework.util.StringUtils;
 import lk.sliit.smartcampus.dto.request.ResourceCreateRequest;
 import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
@@ -130,11 +131,14 @@ public class ResourceServiceImpl implements ResourceService {
 
     Specification<Resource> spec =
         ResourceSpecifications.filter(type, minCapacity, building, status, tag, search);
-    String resolvedSortBy = ALLOWED_SORT_FIELDS.contains(sortBy) ? sortBy : "resourceId";
+    if (!StringUtils.hasText(sortBy) || !ALLOWED_SORT_FIELDS.contains(sortBy)) {
+      throw new IllegalArgumentException(
+          "sortBy must be one of: " + String.join(", ", ALLOWED_SORT_FIELDS));
+    }
     Sort sort =
         "desc".equalsIgnoreCase(sortDir)
-            ? Sort.by(resolvedSortBy).descending()
-            : Sort.by(resolvedSortBy).ascending();
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
     Pageable pageable = PageRequest.of(page, size, sort);
     Page<Resource> resourcePage = resourceRepository.findAll(spec, pageable);
     List<ResourceResponse> items = resourcePage.getContent().stream().map(this::mapToResponse).toList();
