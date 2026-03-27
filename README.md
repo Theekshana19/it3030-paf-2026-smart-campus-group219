@@ -75,3 +75,4 @@ Resource status schedules:
 ### API smoke test guide
 - Quick PowerShell checklist: `backend/docs/resource-api-smoke-test.md`
 - Includes negative tests for `400 Bad Request` validation checks.
+- Includes expected status code checklist for all resource-module endpoints.

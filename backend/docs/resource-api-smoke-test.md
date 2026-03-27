@@ -125,3 +125,30 @@ Invoke-RestMethod -Method DELETE -Uri "http://localhost:8080/api/resources/$($re
 ```
 
 If tag delete fails due to FK constraint, confirm mapping delete step completed successfully before deleting the tag.
+
+## 9) Expected status codes checklist
+
+- `GET /api/resources/test-db` -> `200 OK`
+- `POST /api/resources` -> `201 Created`
+- `GET /api/resources` -> `200 OK`
+- `GET /api/resources/{resourceId}` -> `200 OK`
+- `PUT /api/resources/{resourceId}` -> `200 OK`
+- `DELETE /api/resources/{resourceId}` -> `204 No Content`
+- `POST /api/resource-tags` -> `201 Created`
+- `GET /api/resource-tags` -> `200 OK`
+- `GET /api/resource-tags/{tagId}` -> `200 OK`
+- `PUT /api/resource-tags/{tagId}` -> `200 OK`
+- `DELETE /api/resource-tags/{tagId}` -> `204 No Content`
+- `POST /api/resources/{resourceId}/tags/{tagId}` -> `201 Created`
+- `GET /api/resources/{resourceId}/tags` -> `200 OK`
+- `DELETE /api/resources/{resourceId}/tags/{tagId}` -> `204 No Content`
+- `POST /api/resources/{resourceId}/status-schedules` -> `201 Created`
+- `GET /api/resources/{resourceId}/status-schedules` -> `200 OK`
+- `GET /api/resources/{resourceId}/status-schedules/{scheduleId}` -> `200 OK`
+- `PUT /api/resources/{resourceId}/status-schedules/{scheduleId}` -> `200 OK`
+- `DELETE /api/resources/{resourceId}/status-schedules/{scheduleId}` -> `204 No Content`
+
+Common errors:
+- `400 Bad Request` -> validation issues (query/body constraints)
+- `404 Not Found` -> resource/tag/schedule not found
+- `409 Conflict` -> duplicate resource code or duplicate tag mapping
