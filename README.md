@@ -76,3 +76,17 @@ Resource status schedules:
 - Quick PowerShell checklist: `backend/docs/resource-api-smoke-test.md`
 - Includes negative tests for `400 Bad Request` validation checks.
 - Includes expected status code checklist for all resource-module endpoints.
+
+## Frontend (Vite + React)
+
+The SPA lives in `frontend/`. In development, Vite proxies `/api` to `http://localhost:8080`, so start the backend first (or API calls will fail).
+
+From the repository root:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open the URL Vite prints (typically `http://localhost:5173`). The **Add New Resource** screen is at `/resources/new`.
