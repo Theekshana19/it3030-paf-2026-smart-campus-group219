@@ -1,15 +1,15 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import App from './App.jsx';
+import { router } from './routes/router.jsx';
 import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <App />
+    <>
+      <RouterProvider router={router} />
       <Toaster richColors position="top-right" closeButton />
-    </BrowserRouter>
+    </>
   </StrictMode>
 );

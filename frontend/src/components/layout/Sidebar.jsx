@@ -6,12 +6,13 @@ const navItemClass =
 const activeClass =
   'bg-[#3525cd] text-white rounded-lg mx-2 my-1 flex items-center px-4 py-3 transition-all';
 
-function NavItem({ to, icon, label, end }) {
+function NavItem({ to, icon, label, end, isActive: isActiveProp }) {
   return (
     <NavLink
       to={to}
       end={end}
       className={({ isActive }) => (isActive ? activeClass : navItemClass)}
+      {...(isActiveProp ? { isActive: isActiveProp } : {})}
     >
       {({ isActive }) => (
         <>
@@ -24,6 +25,11 @@ function NavItem({ to, icon, label, end }) {
       )}
     </NavLink>
   );
+}
+
+function catalogueNavActive({ pathname }) {
+  if (pathname === '/resources/new') return false;
+  return pathname === '/resources' || (pathname.startsWith('/resources/') && !pathname.startsWith('/resources/new'));
 }
 
 export default function Sidebar() {
@@ -40,7 +46,12 @@ export default function Sidebar() {
       </div>
       <nav className="flex-1 space-y-1">
         <NavItem to="/" icon="dashboard" label="Dashboard" end />
-        <NavItem to="/resources" icon="inventory_2" label="Resources Catalogue" end />
+        <NavItem
+          to="/resources"
+          icon="inventory_2"
+          label="Resources Catalogue"
+          isActive={catalogueNavActive}
+        />
         <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
         <NavItem to="/scheduling" icon="calendar_today" label="Status Scheduling" />
         <NavItem to="/tags" icon="sell" label="Tag Management" />
