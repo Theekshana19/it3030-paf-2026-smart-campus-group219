@@ -16,6 +16,14 @@ export default function ResourceTableActions({ resourceId, onDelete, disabled = 
         <Icon name="visibility" className="text-xl" />
       </Link>
       <Link
+        to={`/resources/${resourceId}`}
+        className="p-2 rounded-lg text-secondary hover:bg-surface-container transition-colors"
+        title="Edit resource"
+        aria-label="Edit resource"
+      >
+        <Icon name="edit" className="text-xl" />
+      </Link>
+      <Link
         to={`/resources/${resourceId}/schedules`}
         className="p-2 rounded-lg text-secondary hover:bg-surface-container transition-colors"
         title="Schedule status"
