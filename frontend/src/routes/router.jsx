@@ -4,6 +4,7 @@ import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
 import ResourceDetailPlaceholderPage from '../features/resources/pages/ResourceDetailPlaceholderPage.jsx';
 import ResourceSchedulesPlaceholderPage from '../features/resources/pages/ResourceSchedulesPlaceholderPage.jsx';
+import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -36,6 +37,11 @@ export const router = createBrowserRouter([
         path: 'resources/:resourceId/schedules',
         element: <ResourceSchedulesPlaceholderPage />,
         handle: { crumb: 'Status schedules' },
+      },
+      {
+        path: 'resources/:resourceId/edit',
+        element: <EditResourcePage />,
+        handle: { crumb: 'Edit Resource' },
       },
       {
         path: 'resources/:resourceId',

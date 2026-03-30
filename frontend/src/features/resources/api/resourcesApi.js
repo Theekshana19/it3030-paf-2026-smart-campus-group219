@@ -50,3 +50,30 @@ export async function createResource(payload) {
 export async function deleteResource(id) {
   await httpClient.delete(`/api/resources/${id}`);
 }
+
+/**
+ * @param {number|string} id
+ * @returns {Promise<import('../types/resource.types.js').ResourceListItem & Record<string, unknown>>}
+ */
+export async function getResourceById(id) {
+  const { data } = await httpClient.get(`/api/resources/${id}`);
+  return data;
+}
+
+/**
+ * @param {number|string} id
+ * @param {Record<string, unknown>} payload Payload for PUT /api/resources/{id}
+ * @returns {Promise<import('../types/resource.types.js').ResourceListItem & Record<string, unknown>>}
+ */
+export async function updateResource(id, payload) {
+  const { data } = await httpClient.put(`/api/resources/${id}`, payload);
+  return data;
+}
+
+/**
+ * @param {number|string} id
+ */
+export async function listResourceStatusSchedules(id) {
+  const { data } = await httpClient.get(`/api/resources/${id}/status-schedules`);
+  return data;
+}

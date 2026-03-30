@@ -16,3 +16,11 @@ export async function createTag(payload) {
 export async function addTagToResource(resourceId, tagId) {
   await httpClient.post(`/api/resources/${resourceId}/tags/${tagId}`);
 }
+
+/**
+ * @param {number|string} resourceId
+ * @param {number|string} tagId
+ */
+export async function removeTagFromResource(resourceId, tagId) {
+  await httpClient.delete(`/api/resources/${resourceId}/tags/${tagId}`);
+}
