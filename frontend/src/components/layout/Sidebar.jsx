@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import Icon from '../common/Icon.jsx';
 
 const navItemClass =
@@ -6,23 +6,28 @@ const navItemClass =
 const activeClass =
   'bg-[#3525cd] text-white rounded-lg mx-2 my-1 flex items-center px-4 py-3 transition-all';
 
-function NavItem({ to, icon, label, end, isActive: isActiveProp }) {
+function NavItem({ to, icon, label, end, isCustomActive }) {
+  const location = useLocation();
   return (
     <NavLink
       to={to}
       end={end}
-      className={({ isActive }) => (isActive ? activeClass : navItemClass)}
-      {...(isActiveProp ? { isActive: isActiveProp } : {})}
+      className={({ isActive: routerIsActive }) =>
+        (isCustomActive ? isCustomActive(location) : routerIsActive) ? activeClass : navItemClass
+      }
     >
-      {({ isActive }) => (
-        <>
-          <Icon
-            name={icon}
-            className={`mr-3 ${isActive ? '' : 'group-hover:translate-x-1 duration-200'}`}
-          />
-          <span className="font-manrope text-sm tracking-wide">{label}</span>
-        </>
-      )}
+      {({ isActive: routerIsActive }) => {
+        const active = isCustomActive ? isCustomActive(location) : routerIsActive;
+        return (
+          <>
+            <Icon
+              name={icon}
+              className={`mr-3 ${active ? '' : 'group-hover:translate-x-1 duration-200'}`}
+            />
+            <span className="font-manrope text-sm tracking-wide">{label}</span>
+          </>
+        );
+      }}
     </NavLink>
   );
 }
@@ -50,7 +55,7 @@ export default function Sidebar() {
           to="/resources"
           icon="inventory_2"
           label="Resources Catalogue"
-          isActive={catalogueNavActive}
+          isCustomActive={catalogueNavActive}
         />
         <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
         <NavItem to="/scheduling" icon="calendar_today" label="Status Scheduling" />

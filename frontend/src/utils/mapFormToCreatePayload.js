@@ -31,6 +31,8 @@ export function mapFormToCreatePayload(values) {
     resourceCode: values.resourceCode.trim(),
     resourceName: values.resourceName.trim(),
     resourceType: values.resourceType,
+    equipmentSubtype:
+      values.resourceType === 'EQUIPMENT' ? values.equipmentSubtype?.trim() || undefined : undefined,
     capacity: Number.isNaN(capacity) ? null : capacity,
     building: values.building.trim(),
     floor: values.floor?.trim() || undefined,

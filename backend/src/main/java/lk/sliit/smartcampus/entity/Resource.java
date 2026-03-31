@@ -42,6 +42,9 @@ public class Resource {
   @Column(name = "ResourceType", nullable = false, length = 30)
   private ResourceType resourceType;
 
+  @Column(name = "EquipmentSubtype", length = 80)
+  private String equipmentSubtype;
+
   @Column(name = "Capacity")
   private Integer capacity;
 

@@ -23,6 +23,7 @@
  * @property {string} resourceCode
  * @property {string} resourceName
  * @property {ResourceType} resourceType
+ * @property {string|undefined|null} equipmentSubtype
  * @property {number|null|undefined} capacity
  * @property {string|undefined} building
  * @property {string|undefined} floor
@@ -62,6 +63,7 @@
  * @property {string} resourceCode
  * @property {string} resourceName
  * @property {ResourceType} resourceType
+ * @property {string|undefined} equipmentSubtype
  * @property {number|null|undefined} capacity
  * @property {string} building
  * @property {string|undefined} floor
@@ -81,6 +83,17 @@ export const RESOURCE_TYPES = [
   { value: 'LECTURE_HALL', label: 'Lecture Hall' },
   { value: 'MEETING_ROOM', label: 'Meeting Room' },
   { value: 'EQUIPMENT', label: 'Equipment' },
+];
+
+export const EQUIPMENT_SUBTYPES = [
+  { value: 'PROJECTOR', label: 'Projector' },
+  { value: 'CAMERA', label: 'Camera' },
+  { value: 'MICROPHONE', label: 'Microphone' },
+  { value: 'SPEAKER', label: 'Speaker' },
+  { value: 'DISPLAY', label: 'Display / Monitor' },
+  { value: 'LAPTOP', label: 'Laptop' },
+  { value: 'TABLET', label: 'Tablet' },
+  { value: 'OTHER', label: 'Other' },
 ];
 
 /** Backend-allowed sortBy values (see README) */

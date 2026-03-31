@@ -32,6 +32,7 @@ const editSchema = z
     resourceName: z.string().min(1, 'Resource name is required'),
     resourceCode: z.string().min(1, 'Resource code is required'),
     resourceType: resourceTypeEnum,
+    equipmentSubtype: z.string().optional(),
 
     capacity: z.union([z.string(), z.number()]).optional(),
 
@@ -69,6 +70,13 @@ const editSchema = z
         code: z.ZodIssueCode.custom,
         message: 'From time must be before to time',
         path: ['defaultAvailableTo'],
+      });
+    }
+    if (data.resourceType === 'EQUIPMENT' && !data.equipmentSubtype?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Equipment subtype is required for equipment resources',
+        path: ['equipmentSubtype'],
       });
     }
   });
@@ -125,6 +133,7 @@ export default function EditResourcePage() {
       resourceName: '',
       resourceCode: '',
       resourceType: 'LAB',
+      equipmentSubtype: '',
       capacity: '',
       building: '',
       floor: '',
@@ -155,6 +164,7 @@ export default function EditResourcePage() {
   });
 
   const watchedStatus = watch('status');
+  const watchedResourceType = watch('resourceType');
 
   useEffect(() => {
     setMaintenanceEnabled(watchedStatus === 'OUT_OF_SERVICE');
@@ -177,6 +187,7 @@ export default function EditResourcePage() {
         resourceCode: r.resourceCode ?? '',
         resourceName: r.resourceName ?? '',
         resourceType: r.resourceType ?? 'LAB',
+        equipmentSubtype: r.equipmentSubtype ?? '',
         capacity: r.capacity ?? '',
         building: r.building ?? '',
         floor: r.floor ?? '',
@@ -258,6 +269,10 @@ export default function EditResourcePage() {
           resourceCode: values.resourceCode.trim(),
           resourceName: values.resourceName.trim(),
           resourceType: values.resourceType,
+          equipmentSubtype:
+            values.resourceType === 'EQUIPMENT'
+              ? values.equipmentSubtype?.trim() || undefined
+              : undefined,
           capacity:
             values.capacity === '' || values.capacity === null || values.capacity === undefined
               ? null
@@ -360,7 +375,11 @@ export default function EditResourcePage() {
         {/* Left column: Edit form */}
         <div className="lg:col-span-2 space-y-8">
           <form onSubmit={submit} noValidate className="space-y-8">
-            <ResourceEditCoreInfoForm register={register} errors={errors} />
+            <ResourceEditCoreInfoForm
+              register={register}
+              resourceType={watchedResourceType}
+              errors={errors}
+            />
             <ResourceEditCapacityLocationForm register={register} errors={errors} />
             <ResourceEditAvailabilityForm control={control} register={register} errors={errors} />
             <ResourceEditStatusForm control={control} register={register} errors={errors} />

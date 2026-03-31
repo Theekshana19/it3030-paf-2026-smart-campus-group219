@@ -25,6 +25,9 @@ public class ResourceCreateRequest {
   @NotNull
   private ResourceType resourceType;
 
+  @Size(max = 80)
+  private String equipmentSubtype;
+
   @Min(0)
   private Integer capacity;
 

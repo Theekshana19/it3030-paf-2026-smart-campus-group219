@@ -1,13 +1,14 @@
-import { RESOURCE_TYPES } from '../types/resource.types.js';
+import { EQUIPMENT_SUBTYPES, RESOURCE_TYPES } from '../types/resource.types.js';
 
 /**
  * Editable subset for the Edit Resource page.
  * @param {{
  *  register: (name: string) => unknown;
+ *  resourceType: string;
  *  errors: Record<string, { message?: string } | undefined>;
  * }} props
  */
-export default function ResourceEditCoreInfoForm({ register, errors }) {
+export default function ResourceEditCoreInfoForm({ register, resourceType, errors }) {
   const inputClass =
     'w-full bg-surface-container-low border-none rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none text-on-surface';
   const labelClass =
@@ -62,6 +63,22 @@ export default function ResourceEditCoreInfoForm({ register, errors }) {
             <p className="text-error text-xs font-medium">{errors.resourceType.message}</p>
           ) : null}
         </div>
+        {resourceType === 'EQUIPMENT' ? (
+          <div className="space-y-2">
+            <label className={labelClass}>Equipment Subtype</label>
+            <select {...register('equipmentSubtype')} className={inputClass}>
+              <option value="">Select equipment subtype</option>
+              {EQUIPMENT_SUBTYPES.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {errors.equipmentSubtype?.message ? (
+              <p className="text-error text-xs font-medium">{errors.equipmentSubtype.message}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         <div className="md:col-span-2 space-y-2">
           <label className={labelClass}>Description</label>

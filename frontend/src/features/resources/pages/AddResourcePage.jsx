@@ -8,7 +8,7 @@ import { mapFormToCreatePayload } from '../../../utils/mapFormToCreatePayload.js
 import * as resourcesApi from '../api/resourcesApi.js';
 import * as tagsApi from '../api/tagsApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
-import { RESOURCE_TYPES } from '../types/resource.types.js';
+import { EQUIPMENT_SUBTYPES, RESOURCE_TYPES } from '../types/resource.types.js';
 import { useResourceTags } from '../hooks/useResourceTags.js';
 import ResourceFormSection from '../components/ResourceFormSection.jsx';
 import DayToggleGroup from '../components/DayToggleGroup.jsx';
@@ -22,6 +22,7 @@ const defaultValues = {
   resourceName: '',
   resourceCode: '',
   resourceType: 'LAB',
+  equipmentSubtype: '',
   description: '',
   capacity: 30,
   building: '',
@@ -57,6 +58,7 @@ export default function AddResourcePage() {
   });
 
   const watched = watch();
+  const isEquipmentType = watched.resourceType === 'EQUIPMENT';
 
   const runCreate = useCallback(
     async (data, resetAfter) => {
@@ -204,6 +206,22 @@ export default function AddResourcePage() {
                     <p className="text-error text-xs mt-1.5">{errors.resourceType.message}</p>
                   )}
                 </div>
+                {isEquipmentType ? (
+                  <div className="col-span-2">
+                    <label className={labelClass}>Equipment Subtype</label>
+                    <select {...register('equipmentSubtype')} className={inputClass}>
+                      <option value="">Select equipment subtype</option>
+                      {EQUIPMENT_SUBTYPES.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.equipmentSubtype && (
+                      <p className="text-error text-xs mt-1.5">{errors.equipmentSubtype.message}</p>
+                    )}
+                  </div>
+                ) : null}
                 <div className="col-span-2">
                   <label className={labelClass}>Description</label>
                   <textarea

@@ -16,6 +16,7 @@ public class ResourceResponse {
   private String resourceCode;
   private String resourceName;
   private ResourceType resourceType;
+  private String equipmentSubtype;
   private Integer capacity;
   private String building;
   private String floor;

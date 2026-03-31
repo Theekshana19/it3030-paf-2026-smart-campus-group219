@@ -17,6 +17,7 @@ public class ResourceMapper {
         .resourceCode(request.getResourceCode().trim())
         .resourceName(request.getResourceName().trim())
         .resourceType(request.getResourceType())
+        .equipmentSubtype(trimToNull(request.getEquipmentSubtype()))
         .capacity(request.getCapacity())
         .building(request.getBuilding())
         .floor(request.getFloor())
@@ -36,6 +37,7 @@ public class ResourceMapper {
     entity.setResourceCode(request.getResourceCode().trim());
     entity.setResourceName(request.getResourceName().trim());
     entity.setResourceType(request.getResourceType());
+    entity.setEquipmentSubtype(trimToNull(request.getEquipmentSubtype()));
     entity.setCapacity(request.getCapacity());
     entity.setBuilding(request.getBuilding());
     entity.setFloor(request.getFloor());
@@ -70,6 +72,7 @@ public class ResourceMapper {
         .resourceCode(entity.getResourceCode())
         .resourceName(entity.getResourceName())
         .resourceType(entity.getResourceType())
+        .equipmentSubtype(entity.getEquipmentSubtype())
         .capacity(entity.getCapacity())
         .building(entity.getBuilding())
         .floor(entity.getFloor())
@@ -89,5 +92,11 @@ public class ResourceMapper {
         .todayBookingCount(todayBookingCount)
         .tags(safeTags)
         .build();
+  }
+
+  private String trimToNull(String value) {
+    if (value == null) return null;
+    String trimmed = value.trim();
+    return trimmed.isEmpty() ? null : trimmed;
   }
 }
