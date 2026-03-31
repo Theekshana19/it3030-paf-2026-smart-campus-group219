@@ -7,6 +7,10 @@
  */
 
 /**
+ * @typedef {'ACTIVE'|'OUT_OF_SERVICE'} ScheduledStatus
+ */
+
+/**
  * @typedef {'AVAILABLE_NOW'|'BUSY_SOON'|'FULLY_BOOKED_TODAY'|'OUT_OF_SERVICE'} SmartAvailabilityStatus
  */
 
@@ -115,3 +119,8 @@ export const OPERATIONAL_STATUS_OPTIONS = [
 ];
 
 export const WEEKDAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+
+export const SCHEDULED_STATUS_OPTIONS = [
+  { value: 'OUT_OF_SERVICE', label: 'Maintenance (Out of Service)' },
+  { value: 'ACTIVE', label: 'Active' },
+];

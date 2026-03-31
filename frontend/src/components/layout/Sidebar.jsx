@@ -37,6 +37,10 @@ function catalogueNavActive({ pathname }) {
   return pathname === '/resources' || (pathname.startsWith('/resources/') && !pathname.startsWith('/resources/new'));
 }
 
+function schedulingNavActive({ pathname }) {
+  return pathname === '/scheduling' || pathname.endsWith('/schedules');
+}
+
 export default function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-[#545f73] dark:bg-slate-900 flex flex-col py-7 shadow-2xl z-50">
@@ -58,7 +62,12 @@ export default function Sidebar() {
           isCustomActive={catalogueNavActive}
         />
         <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
-        <NavItem to="/scheduling" icon="calendar_today" label="Status Scheduling" />
+        <NavItem
+          to="/scheduling"
+          icon="calendar_today"
+          label="Status Scheduling"
+          isCustomActive={schedulingNavActive}
+        />
         <NavItem to="/tags" icon="sell" label="Tag Management" />
         <NavItem to="/settings" icon="settings" label="Settings" />
       </nav>

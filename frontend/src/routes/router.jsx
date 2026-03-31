@@ -3,7 +3,7 @@ import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
 import ResourceDetailPlaceholderPage from '../features/resources/pages/ResourceDetailPlaceholderPage.jsx';
-import ResourceSchedulesPlaceholderPage from '../features/resources/pages/ResourceSchedulesPlaceholderPage.jsx';
+import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
 
 function PlaceholderPage({ title }) {
@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'resources/:resourceId/schedules',
-        element: <ResourceSchedulesPlaceholderPage />,
+        element: <ResourceStatusSchedulingPage />,
         handle: { crumb: 'Status schedules' },
       },
       {

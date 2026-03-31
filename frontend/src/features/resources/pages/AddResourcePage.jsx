@@ -77,12 +77,16 @@ export default function AddResourcePage() {
         if (resetAfter) {
           reset({ ...defaultValues });
           setSelectedTags([]);
+        } else {
+          navigate('/resources');
         }
+        return true;
       } catch (e) {
         toast.error(getErrorMessage(e));
+        return false;
       }
     },
-    [reset, selectedTags]
+    [navigate, reset, selectedTags]
   );
 
   const onAddTag = useCallback((tag) => {
@@ -109,12 +113,6 @@ export default function AddResourcePage() {
     },
     [runCreate]
   );
-
-  const onSaveAndAnother = useCallback(() => {
-    handleSubmit(async (data) => {
-      await runCreate(data, true);
-    })();
-  }, [handleSubmit, runCreate]);
 
   const previewProps = useMemo(
     () => ({
@@ -350,11 +348,7 @@ export default function AddResourcePage() {
               </ResourceFormSection>
             </div>
 
-            <PageActionButtons
-              onCancel={() => navigate(-1)}
-              onSaveAndAnother={onSaveAndAnother}
-              loading={isSubmitting}
-            />
+            <PageActionButtons onCancel={() => navigate(-1)} loading={isSubmitting} />
           </div>
         </form>
       </div>

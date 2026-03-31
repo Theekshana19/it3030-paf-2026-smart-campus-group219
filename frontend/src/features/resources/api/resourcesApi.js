@@ -77,3 +77,33 @@ export async function listResourceStatusSchedules(id) {
   const { data } = await httpClient.get(`/api/resources/${id}/status-schedules`);
   return data;
 }
+
+/**
+ * @param {number|string} id
+ * @param {Record<string, unknown>} payload
+ */
+export async function createResourceStatusSchedule(id, payload) {
+  const { data } = await httpClient.post(`/api/resources/${id}/status-schedules`, payload);
+  return data;
+}
+
+/**
+ * @param {number|string} resourceId
+ * @param {number|string} scheduleId
+ * @param {Record<string, unknown>} payload
+ */
+export async function updateResourceStatusSchedule(resourceId, scheduleId, payload) {
+  const { data } = await httpClient.put(
+    `/api/resources/${resourceId}/status-schedules/${scheduleId}`,
+    payload
+  );
+  return data;
+}
+
+/**
+ * @param {number|string} resourceId
+ * @param {number|string} scheduleId
+ */
+export async function deleteResourceStatusSchedule(resourceId, scheduleId) {
+  await httpClient.delete(`/api/resources/${resourceId}/status-schedules/${scheduleId}`);
+}
