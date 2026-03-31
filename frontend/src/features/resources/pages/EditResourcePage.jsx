@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import * as resourcesApi from '../api/resourcesApi.js';
 import * as tagsApi from '../api/tagsApi.js';
@@ -115,6 +115,7 @@ function splitWorkingDays(s) {
 
 export default function EditResourcePage() {
   const { resourceId } = useParams();
+  const navigate = useNavigate();
   const { ensureTag } = useResourceTags();
 
   const [resource, setResource] = useState(null);
@@ -314,14 +315,14 @@ export default function EditResourcePage() {
         }
 
         await successAlert({ title: 'Resource updated successfully' });
-        await load();
+        navigate('/resources');
       } catch (e) {
         toast.error(getErrorMessage(e));
       } finally {
         setSaving(false);
       }
     },
-    [initialSelectedTags, load, resource, resourceId, selectedTags]
+    [initialSelectedTags, navigate, resource, resourceId, selectedTags]
   );
 
   const submit = handleSubmit(onSave);
