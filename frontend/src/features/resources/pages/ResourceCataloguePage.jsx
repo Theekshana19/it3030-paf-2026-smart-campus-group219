@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useResourceCatalogue } from '../hooks/useResourceCatalogue.js';
 import * as resourcesApi from '../api/resourcesApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
+import { confirmDeleteAlert, successAlert } from '../../../utils/sweetAlerts.js';
 import ResourceListHeader from '../components/ResourceListHeader.jsx';
 import ResourceFiltersPanel from '../components/ResourceFiltersPanel.jsx';
 import ActiveFilterChips from '../components/ActiveFilterChips.jsx';
@@ -95,11 +96,15 @@ export default function ResourceCataloguePage() {
 
   const handleDelete = useCallback(
     async (id) => {
-      if (!window.confirm('Delete this resource? This cannot be undone.')) return;
+      const ok = await confirmDeleteAlert({
+        title: 'Delete Resource?',
+        text: 'This action is permanent and cannot be undone.',
+      });
+      if (!ok) return;
       setDeleteBusyId(id);
       try {
         await resourcesApi.deleteResource(id);
-        toast.success('Resource deleted.');
+        await successAlert({ title: 'Resource deleted' });
         await refetch();
       } catch (e) {
         toast.error(getErrorMessage(e));

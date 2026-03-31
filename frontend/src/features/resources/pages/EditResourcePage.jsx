@@ -22,6 +22,7 @@ import ResourceAccessPermissionsCard from '../components/ResourceAccessPermissio
 import LiveInsightsPanel from '../components/LiveInsightsPanel.jsx';
 import ResourceImagePreview from '../components/ResourceImagePreview.jsx';
 import SaveActionFooter from '../components/SaveActionFooter.jsx';
+import { successAlert } from '../../../utils/sweetAlerts.js';
 
 const resourceTypeValues = RESOURCE_TYPES.map((t) => t.value);
 const resourceTypeEnum = z.enum(resourceTypeValues);
@@ -312,7 +313,7 @@ export default function EditResourcePage() {
           }
         }
 
-        toast.success('Resource updated successfully.');
+        await successAlert({ title: 'Resource updated successfully' });
         await load();
       } catch (e) {
         toast.error(getErrorMessage(e));

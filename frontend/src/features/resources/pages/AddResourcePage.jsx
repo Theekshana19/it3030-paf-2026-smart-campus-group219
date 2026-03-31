@@ -17,6 +17,7 @@ import TagInputSection from '../components/TagInputSection.jsx';
 import LivePreviewCard from '../components/LivePreviewCard.jsx';
 import SmartTipsCard from '../components/SmartTipsCard.jsx';
 import PageActionButtons from '../components/PageActionButtons.jsx';
+import { successAlert } from '../../../utils/sweetAlerts.js';
 
 const defaultValues = {
   resourceName: '',
@@ -73,7 +74,7 @@ export default function AddResourcePage() {
             console.warn('Tag attach failed', t.tagId, e);
           }
         }
-        toast.success('Resource registered successfully.');
+        await successAlert({ title: 'Resource saved successfully' });
         if (resetAfter) {
           reset({ ...defaultValues });
           setSelectedTags([]);

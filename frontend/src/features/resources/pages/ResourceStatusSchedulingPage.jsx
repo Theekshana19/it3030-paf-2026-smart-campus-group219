@@ -13,6 +13,7 @@ import ScheduleConflictBanner from '../components/ScheduleConflictBanner.jsx';
 import ScheduleFormCard from '../components/ScheduleFormCard.jsx';
 import UpcomingShiftsPanel from '../components/UpcomingShiftsPanel.jsx';
 import AdminControlsCard from '../components/AdminControlsCard.jsx';
+import { confirmDeleteAlert, successAlert } from '../../../utils/sweetAlerts.js';
 
 const scheduleSchema = z
   .object({
@@ -232,7 +233,7 @@ export default function ResourceStatusSchedulingPage() {
           reasonNote: values.reasonNote.trim(),
           isActive: true,
         });
-        toast.success('Schedule committed successfully.');
+        await successAlert({ title: 'Schedule committed successfully' });
         reset({ ...defaultForm, scheduleDate: values.scheduleDate });
         await load();
       } catch (e) {
@@ -247,11 +248,15 @@ export default function ResourceStatusSchedulingPage() {
   const onDelete = useCallback(
     async (scheduleId) => {
       if (!resourceId) return;
-      if (!window.confirm('Delete this scheduled entry?')) return;
+      const ok = await confirmDeleteAlert({
+        title: 'Delete Schedule?',
+        text: 'This scheduled entry will be permanently removed.',
+      });
+      if (!ok) return;
       setDeletingId(scheduleId);
       try {
         await resourcesApi.deleteResourceStatusSchedule(resourceId, scheduleId);
-        toast.success('Schedule deleted.');
+        await successAlert({ title: 'Schedule deleted' });
         await load();
       } catch (e) {
         toast.error(getErrorMessage(e));
