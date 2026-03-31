@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
-import ResourceDetailPlaceholderPage from '../features/resources/pages/ResourceDetailPlaceholderPage.jsx';
+import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage.jsx';
 import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
 
@@ -45,7 +45,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'resources/:resourceId',
-        element: <ResourceDetailPlaceholderPage />,
+        element: <ResourceDetailsPage />,
         handle: { crumb: 'Resource details' },
       },
       {

@@ -1,6 +1,12 @@
 import Icon from '../../../components/common/Icon.jsx';
 
-export default function EmptyResourcesState() {
+/**
+ * @param {{
+ *  onAddResource?: () => void;
+ *  onClearFilters?: () => void;
+ * }} props
+ */
+export default function EmptyResourcesState({ onAddResource, onClearFilters }) {
   return (
     <tr>
       <td colSpan={7} className="py-20 px-8 text-center">
@@ -24,6 +30,7 @@ export default function EmptyResourcesState() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
             <button
               type="button"
+              onClick={onAddResource}
               className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white font-semibold rounded-xl transition-all hover:shadow-[0_32px_32px_-4px_rgba(23,28,31,0.1)] active:scale-95"
             >
               <Icon name="add_circle" className="mr-2" />
@@ -31,6 +38,7 @@ export default function EmptyResourcesState() {
             </button>
             <button
               type="button"
+              onClick={onClearFilters}
               className="inline-flex items-center justify-center px-6 py-3 bg-surface-container-high text-secondary font-semibold rounded-xl transition-all hover:bg-surface-container-highest active:scale-95"
             >
               <Icon name="close" className="mr-2" />

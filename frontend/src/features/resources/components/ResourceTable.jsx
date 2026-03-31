@@ -19,6 +19,8 @@ const SORTABLE = [
  *   onSort: (field: string) => void;
  *   onDelete: (id: number) => void;
  *   deleteBusyId?: number | null;
+ *   onAddResource?: () => void;
+ *   onClearFilters?: () => void;
  * }} props
  */
 export default function ResourceTable({
@@ -29,6 +31,8 @@ export default function ResourceTable({
   onSort,
   onDelete,
   deleteBusyId = null,
+  onAddResource,
+  onClearFilters,
 }) {
   return (
     <div className="rounded-2xl border border-outline-variant/15 bg-surface-container-lowest shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)] overflow-hidden">
@@ -73,7 +77,7 @@ export default function ResourceTable({
             {loading ? (
               <LoadingResourcesState />
             ) : rows.length === 0 ? (
-              <EmptyResourcesState />
+              <EmptyResourcesState onAddResource={onAddResource} onClearFilters={onClearFilters} />
             ) : (
               rows.map((row) => (
                 <ResourceTableRow

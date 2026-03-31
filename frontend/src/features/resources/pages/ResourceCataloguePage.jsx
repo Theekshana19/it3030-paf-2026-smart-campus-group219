@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import { useResourceCatalogue } from '../hooks/useResourceCatalogue.js';
 import * as resourcesApi from '../api/resourcesApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
@@ -58,6 +59,7 @@ function exportResourcesCsv(rows) {
 }
 
 export default function ResourceCataloguePage() {
+  const navigate = useNavigate();
   const {
     filters,
     setFilter,
@@ -123,6 +125,13 @@ export default function ResourceCataloguePage() {
     [setFilter, setSearchInput]
   );
 
+  const handleClearFiltersFromEmpty = useCallback(() => {
+    clearFilters();
+    setSearchInput('');
+    setOnlyAvailableNow(false);
+    setPage(0);
+  }, [clearFilters, setOnlyAvailableNow, setPage, setSearchInput]);
+
   return (
     <div className="p-6 md:p-8 max-w-[1440px] mx-auto w-full space-y-7 md:space-y-8">
       <ResourceListHeader onExport={handleExport} exportDisabled={loading || displayItems.length === 0} />
@@ -169,6 +178,8 @@ export default function ResourceCataloguePage() {
         onSort={toggleSort}
         onDelete={handleDelete}
         deleteBusyId={deleteBusyId}
+        onAddResource={() => navigate('/resources/new')}
+        onClearFilters={handleClearFiltersFromEmpty}
       />
 
       <PaginationControls
