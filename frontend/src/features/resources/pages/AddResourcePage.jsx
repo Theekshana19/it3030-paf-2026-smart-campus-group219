@@ -13,7 +13,7 @@ import { useResourceTags } from '../hooks/useResourceTags.js';
 import ResourceFormSection from '../components/ResourceFormSection.jsx';
 import DayToggleGroup from '../components/DayToggleGroup.jsx';
 import StatusRadioGroup from '../components/StatusRadioGroup.jsx';
-import TagInputSection from '../components/TagInputSection.jsx';
+import ResourceFeaturesCard from '../components/ResourceFeaturesCard.jsx';
 import LivePreviewCard from '../components/LivePreviewCard.jsx';
 import SmartTipsCard from '../components/SmartTipsCard.jsx';
 import PageActionButtons from '../components/PageActionButtons.jsx';
@@ -334,19 +334,12 @@ export default function AddResourcePage() {
                   )}
                 />
               </ResourceFormSection>
-              <ResourceFormSection
-                title="Tagging"
-                icon="sell"
-                iconWrapClassName="bg-on-tertiary-container"
-                iconClassName="text-tertiary-container"
-              >
-                <TagInputSection
-                  selected={selectedTags}
-                  onAdd={onAddTag}
-                  onRemove={onRemoveTag}
-                  onCreateTag={handleCreateTagInput}
-                />
-              </ResourceFormSection>
+              <ResourceFeaturesCard
+                selectedTags={selectedTags}
+                onAddTag={onAddTag}
+                onRemoveTag={onRemoveTag}
+                onCreateTag={handleCreateTagInput}
+              />
             </div>
 
             <PageActionButtons onCancel={() => navigate(-1)} loading={isSubmitting} />

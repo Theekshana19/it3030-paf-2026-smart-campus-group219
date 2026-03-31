@@ -1,13 +1,11 @@
 import { useMemo, useState } from 'react';
 import Icon from '../../../components/common/Icon.jsx';
 import TagInputSection from './TagInputSection.jsx';
-
-const FEATURE_TILES = [
-  { key: 'recording', label: 'Recording', icon: 'videocam' },
-  { key: 'fiber_wifi', label: 'Fiber WiFi', icon: 'wifi' },
-  { key: 'ada', label: 'ADA Compliant', icon: 'accessible' },
-  { key: 'pantry', label: 'Pantry', icon: 'kitchen' },
-];
+import {
+  FEATURE_TAG_MAP,
+  findFeatureByTagName,
+  normalizeTagName,
+} from '../constants/featureTags.js';
 
 /**
  * Edit card used by the Edit Resource page.
@@ -26,18 +24,26 @@ export default function ResourceFeaturesCard({
   onRemoveTag,
   onCreateTag,
 }) {
-  const [selectedFeatures, setSelectedFeatures] = useState(() => new Set());
   const [tagInputOpen, setTagInputOpen] = useState(false);
+  const selectedByName = useMemo(
+    () => new Set((selectedTags || []).map((tag) => normalizeTagName(tag.tagName))),
+    [selectedTags]
+  );
+  const tiles = useMemo(() => FEATURE_TAG_MAP, []);
 
-  const tiles = useMemo(() => FEATURE_TILES, []);
-
-  const toggleTile = (key) => {
-    setSelectedFeatures((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
+  const toggleTile = async (tile) => {
+    const existing = (selectedTags || []).find((tag) => {
+      const feature = findFeatureByTagName(tag.tagName);
+      return feature?.key === tile.key;
     });
+
+    if (existing) {
+      onRemoveTag(existing.tagId);
+      return;
+    }
+
+    const createdOrFound = await onCreateTag(tile.label);
+    if (createdOrFound) onAddTag(createdOrFound);
   };
 
   return (
@@ -72,12 +78,14 @@ export default function ResourceFeaturesCard({
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {tiles.map((t) => {
-          const on = selectedFeatures.has(t.key);
+          const on =
+            selectedByName.has(normalizeTagName(t.label)) ||
+            selectedByName.has(normalizeTagName(t.key));
           return (
             <button
               key={t.key}
               type="button"
-              onClick={() => toggleTile(t.key)}
+              onClick={() => toggleTile(t)}
               className={[
                 'p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all',
                 on ? 'border-primary/30 bg-primary-fixed' : 'border-primary/10 bg-surface',
