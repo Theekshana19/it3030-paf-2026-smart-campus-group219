@@ -19,6 +19,10 @@ build/
 ## Secrets / env files
 .env
 .env.*
+.claude
 
 ## Local run logs
 backend/server-*.log
+
+## Docker
+docker-compose.override.yml
