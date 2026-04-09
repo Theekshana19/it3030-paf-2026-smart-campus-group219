@@ -18,16 +18,24 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({TagNotFoundException.class, ScheduleNotFoundException.class})
+  @ExceptionHandler({TagNotFoundException.class, ScheduleNotFoundException.class,
+      BookingNotFoundException.class})
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class})
+  @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class,
+      BookingConflictException.class})
   public ResponseEntity<ApiErrorResponse> handleConflict(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.CONFLICT, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(InvalidBookingStateException.class)
+  public ResponseEntity<ApiErrorResponse> handleInvalidState(
+      InvalidBookingStateException exception, HttpServletRequest request) {
+    return build(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
