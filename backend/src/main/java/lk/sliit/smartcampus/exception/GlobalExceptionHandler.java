@@ -19,7 +19,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler({TagNotFoundException.class, ScheduleNotFoundException.class,
-      BookingNotFoundException.class})
+      BookingNotFoundException.class, TicketNotFoundException.class,
+      CommentNotFoundException.class})
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
@@ -32,10 +33,17 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.CONFLICT, exception.getMessage(), request);
   }
 
-  @ExceptionHandler(InvalidBookingStateException.class)
+  @ExceptionHandler({InvalidBookingStateException.class, InvalidTicketStateException.class,
+      AttachmentLimitException.class})
   public ResponseEntity<ApiErrorResponse> handleInvalidState(
-      InvalidBookingStateException exception, HttpServletRequest request) {
+      RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(CommentOwnershipException.class)
+  public ResponseEntity<ApiErrorResponse> handleForbidden(
+      CommentOwnershipException exception, HttpServletRequest request) {
+    return build(HttpStatus.FORBIDDEN, exception.getMessage(), request);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
