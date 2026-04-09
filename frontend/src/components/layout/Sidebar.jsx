@@ -37,6 +37,11 @@ function catalogueNavActive({ pathname }) {
   return pathname === '/resources' || (pathname.startsWith('/resources/') && !pathname.startsWith('/resources/new'));
 }
 
+function bookingsNavActive({ pathname }) {
+  if (pathname === '/bookings/new') return false;
+  return pathname === '/bookings' || (pathname.startsWith('/bookings/') && !pathname.startsWith('/bookings/new'));
+}
+
 function schedulingNavActive({ pathname }) {
   return pathname === '/scheduling' || pathname.endsWith('/schedules');
 }
@@ -62,6 +67,13 @@ export default function Sidebar() {
           isCustomActive={catalogueNavActive}
         />
         <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
+        <NavItem
+          to="/bookings"
+          icon="event_note"
+          label="Bookings"
+          isCustomActive={bookingsNavActive}
+        />
+        <NavItem to="/bookings/new" icon="edit_calendar" label="New Booking" />
         <NavItem
           to="/scheduling"
           icon="calendar_today"
