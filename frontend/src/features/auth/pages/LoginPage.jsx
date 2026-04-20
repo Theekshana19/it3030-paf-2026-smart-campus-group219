@@ -22,12 +22,12 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-on-surface mb-1.5">
-              Name
+            <label htmlFor="displayName" className="block text-sm font-medium text-on-surface mb-1.5">
+              Display name
             </label>
             <input
-              id="name"
-              name="name"
+              id="displayName"
+              name="displayName"
               type="text"
               placeholder="Your display name"
               className="w-full rounded-lg border border-outline-variant/50 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
