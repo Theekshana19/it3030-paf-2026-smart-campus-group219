@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useLocation, useMatches } from 'react-router-dom';
 import Icon from '../common/Icon.jsx';
 import { getResourceById } from '../../features/resources/api/resourcesApi.js';
+import NotificationsBell from '../../features/notifications/components/NotificationsBell.jsx';
+import NotificationsPanel from '../../features/notifications/components/NotificationsPanel.jsx';
 
 const AVATAR_SRC =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuCw25ZT-KYKlBFBrQ2CGdHDD9XiQnjngGoNOpNVSc2xA8RL7rWNPmaxwR5N_qTwJtYWmEHU35YGs8DQoJFHKF1Pvum8BnB64IhVe2HWIgcwPa2d0rfctOw2Vi-X42A1vQTFoB7Wf0Z-DtNGnF2Pl717OOAsX9hSywHgeTM7Iekl_UO6D_c_TZssF6y9yndSEymr_-S55cBBVQUSQhbw1Jzol3VquFA0dAiH19tn-SLdyLZrcx_9f8TMgCxcf2cMLF4oUHID1lk7VvOX';
@@ -18,6 +20,8 @@ export default function TopHeader() {
   }, [location.pathname]);
 
   const [editName, setEditName] = useState(null);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [headerNotifications] = useState([]);
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -37,6 +41,7 @@ export default function TopHeader() {
 
   const headerLabel =
     editResourceId && editName ? `Edit Resource: ${editName}` : editResourceId ? 'Edit Resource' : crumb;
+  const unreadCount = headerNotifications.filter((item) => !item.isRead).length;
 
   return (
     <header className="bg-[#f6fafe] shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)] flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40">
@@ -56,14 +61,17 @@ export default function TopHeader() {
           />
         </div>
         <div className="flex items-center gap-3 border-l border-outline-variant/30 pl-5">
-          <button
-            type="button"
-            className="p-2 rounded-full hover:bg-[#eaeef2] transition-colors relative"
-            aria-label="Notifications"
-          >
-            <Icon name="notifications" className="text-secondary" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full" />
-          </button>
+          <div className="relative">
+            <NotificationsBell
+              unreadCount={unreadCount}
+              onClick={() => setIsNotificationsOpen((prev) => !prev)}
+            />
+            {isNotificationsOpen ? (
+              <div className="absolute right-0 top-12 z-50">
+                <NotificationsPanel notifications={headerNotifications} loading={false} />
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             className="p-2 rounded-full hover:bg-[#eaeef2] transition-colors"
