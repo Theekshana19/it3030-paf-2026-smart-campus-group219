@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
+import ProtectedRoute from '../features/auth/components/ProtectedRoute.jsx';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
@@ -25,7 +26,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <DashboardLayout />,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <PlaceholderPage title="Dashboard" />, handle: { crumb: 'Dashboard' } },
       {
