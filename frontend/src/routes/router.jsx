@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
+import LoginPage from '../features/auth/pages/LoginPage.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
 import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage.jsx';
@@ -18,6 +19,10 @@ function PlaceholderPage({ title }) {
 }
 
 export const router = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
   {
     path: '/',
     element: <DashboardLayout />,
