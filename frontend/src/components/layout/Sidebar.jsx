@@ -1,4 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
+import { useAuth } from '../../features/auth/hooks/useAuth.js';
 import Icon from '../common/Icon.jsx';
 
 const navItemClass =
@@ -42,6 +43,9 @@ function schedulingNavActive({ pathname }) {
 }
 
 export default function Sidebar() {
+  const { currentUser } = useAuth();
+  const isAdmin = currentUser?.role === 'ADMIN';
+
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-[#545f73] dark:bg-slate-900 flex flex-col py-7 shadow-2xl z-50">
       <div className="px-6 mb-8 flex items-center gap-3">
@@ -69,6 +73,7 @@ export default function Sidebar() {
           isCustomActive={schedulingNavActive}
         />
         <NavItem to="/tags" icon="sell" label="Tag Management" />
+        {isAdmin ? <NavItem to="/users" icon="group" label="User Management" /> : null}
         <NavItem to="/settings" icon="settings" label="Settings" />
       </nav>
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">
