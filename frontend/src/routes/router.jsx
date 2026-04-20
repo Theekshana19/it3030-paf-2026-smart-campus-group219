@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.jsx';
+import { useAuth } from '../features/auth/hooks/useAuth.js';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
@@ -17,6 +18,16 @@ function PlaceholderPage({ title }) {
       </p>
     </div>
   );
+}
+
+function AdminRoute({ children }) {
+  const { currentUser } = useAuth();
+
+  if (currentUser?.role !== 'ADMIN') {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 }
 
 export const router = createBrowserRouter([
@@ -72,6 +83,15 @@ export const router = createBrowserRouter([
         path: 'settings',
         element: <PlaceholderPage title="Settings" />,
         handle: { crumb: 'Settings' },
+      },
+      {
+        path: 'users',
+        element: (
+          <AdminRoute>
+            <PlaceholderPage title="User management" />
+          </AdminRoute>
+        ),
+        handle: { crumb: 'Users' },
       },
     ],
   },
