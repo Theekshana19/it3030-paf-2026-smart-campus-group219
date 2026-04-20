@@ -1,5 +1,6 @@
 package lk.sliit.smartcampus.config;
 
+import lk.sliit.smartcampus.enums.UserRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,8 +19,10 @@ public class SecurityConfig {
             auth ->
                 auth.requestMatchers("/api/auth/google")
                     .permitAll()
-                    .requestMatchers("/api/auth/me", "/api/notifications/**", "/api/users/**")
+                    .requestMatchers("/api/auth/me", "/api/notifications/**")
                     .authenticated()
+                    .requestMatchers("/api/users/**")
+                    .hasRole(UserRole.ADMIN.name())
                     .anyRequest()
                     .permitAll());
 
