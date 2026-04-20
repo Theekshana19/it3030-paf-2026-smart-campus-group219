@@ -1,17 +1,25 @@
-// loading skeleton for the booking list
+function SkeletonRow() {
+  return (
+    <tr className="border-b border-surface-container-high/60">
+      {[140, 180, 100, 110, 160, 90, 60].map((w, i) => (
+        <td key={i} className="px-4 py-4">
+          <div className="h-4 bg-surface-container-high rounded-full animate-pulse" style={{ width: w }} />
+        </td>
+      ))}
+    </tr>
+  );
+}
+
 export default function LoadingBookingsState() {
   return (
-    <div className="bg-surface-container-lowest rounded-xl shadow-sm p-6 space-y-4 animate-pulse">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="flex items-center gap-4">
-          <div className="h-4 bg-surface-container-high rounded w-20" />
-          <div className="h-4 bg-surface-container-high rounded w-32" />
-          <div className="h-4 bg-surface-container-high rounded w-24" />
-          <div className="h-4 bg-surface-container-high rounded w-20" />
-          <div className="h-4 bg-surface-container-high rounded w-28" />
-          <div className="h-6 bg-surface-container-high rounded-full w-20" />
-        </div>
-      ))}
+    <div className="bg-surface-container-lowest rounded-2xl border border-surface-container-high shadow-sm overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <tbody>
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonRow key={i} />)}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

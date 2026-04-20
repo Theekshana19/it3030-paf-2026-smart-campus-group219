@@ -12,7 +12,6 @@ import EmptyBookingsState from '../components/EmptyBookingsState.jsx';
 import LoadingBookingsState from '../components/LoadingBookingsState.jsx';
 import Icon from '../../../components/common/Icon.jsx';
 
-// main booking list page with filters and table
 export default function BookingListPage() {
   const {
     filters, setFilter, clearFilters,
@@ -22,7 +21,6 @@ export default function BookingListPage() {
     loading, refetch,
   } = useBookingList();
 
-  // handle delete booking with confirmation
   const handleDelete = useCallback(
     async (bookingId, bookingRef) => {
       const confirmed = await confirmDeleteAlert({
@@ -42,26 +40,12 @@ export default function BookingListPage() {
   );
 
   return (
-    <div className="p-8 md:p-10 max-w-7xl mx-auto">
+    <div className="p-6 md:p-8 max-w-screen-xl mx-auto">
       <BookingListHeader totalItems={totalItems} />
 
-      {/* search bar */}
-      <div className="mb-6">
-        <div className="relative max-w-md">
-          <Icon name="search" className="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search by reference, purpose, or name..."
-            className="w-full bg-surface-container-lowest border-none rounded-lg pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none shadow-sm"
-          />
-        </div>
-      </div>
-
-      <div className="flex gap-6">
+      <div className="flex gap-6 items-start">
         {/* filters sidebar */}
-        <div className="hidden lg:block w-64 flex-shrink-0">
+        <div className="hidden lg:block w-60 flex-shrink-0 sticky top-6">
           <BookingFiltersPanel
             filters={filters}
             setFilter={setFilter}
@@ -70,7 +54,28 @@ export default function BookingListPage() {
         </div>
 
         {/* main content */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-4">
+          {/* search bar */}
+          <div className="relative">
+            <Icon name="search" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-lg" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search by reference, purpose, or name..."
+              className="w-full bg-surface-container-lowest border border-surface-container-high rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-body outline-none shadow-sm"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => setSearchInput('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 hover:text-on-surface transition-colors"
+              >
+                <Icon name="close" className="text-lg" />
+              </button>
+            )}
+          </div>
+
           {loading ? (
             <LoadingBookingsState />
           ) : items.length === 0 ? (
