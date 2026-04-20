@@ -5,6 +5,14 @@ import ResourceCataloguePage from '../features/resources/pages/ResourceCatalogue
 import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage.jsx';
 import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
+import BookingListPage from '../features/bookings/pages/BookingListPage.jsx';
+import CreateBookingPage from '../features/bookings/pages/CreateBookingPage.jsx';
+import BookingDetailsPage from '../features/bookings/pages/BookingDetailsPage.jsx';
+import EditBookingPage from '../features/bookings/pages/EditBookingPage.jsx';
+import TicketListPage from '../features/tickets/pages/TicketListPage.jsx';
+import CreateTicketPage from '../features/tickets/pages/CreateTicketPage.jsx';
+import TicketDetailsPage from '../features/tickets/pages/TicketDetailsPage.jsx';
+import EditTicketPage from '../features/tickets/pages/EditTicketPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -47,6 +55,46 @@ export const router = createBrowserRouter([
         path: 'resources/:resourceId',
         element: <ResourceDetailsPage />,
         handle: { crumb: 'Resource details' },
+      },
+      {
+        path: 'bookings',
+        element: <BookingListPage />,
+        handle: { crumb: 'Bookings' },
+      },
+      {
+        path: 'bookings/new',
+        element: <CreateBookingPage />,
+        handle: { crumb: 'New Booking' },
+      },
+      {
+        path: 'bookings/:bookingId/edit',
+        element: <EditBookingPage />,
+        handle: { crumb: 'Edit Booking' },
+      },
+      {
+        path: 'bookings/:bookingId',
+        element: <BookingDetailsPage />,
+        handle: { crumb: 'Booking Details' },
+      },
+      {
+        path: 'tickets',
+        element: <TicketListPage />,
+        handle: { crumb: 'Incident Tickets' },
+      },
+      {
+        path: 'tickets/new',
+        element: <CreateTicketPage />,
+        handle: { crumb: 'Report Issue' },
+      },
+      {
+        path: 'tickets/:ticketId/edit',
+        element: <EditTicketPage />,
+        handle: { crumb: 'Edit Ticket' },
+      },
+      {
+        path: 'tickets/:ticketId',
+        element: <TicketDetailsPage />,
+        handle: { crumb: 'Ticket Details' },
       },
       {
         path: 'scheduling',

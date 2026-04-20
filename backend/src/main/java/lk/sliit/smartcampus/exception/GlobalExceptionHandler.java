@@ -18,20 +18,32 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({
-    TagNotFoundException.class,
-    ScheduleNotFoundException.class,
-    NotificationNotFoundException.class
-  })
+  @ExceptionHandler({TagNotFoundException.class, ScheduleNotFoundException.class,
+      NotificationNotFoundException.class, BookingNotFoundException.class,
+      TicketNotFoundException.class, CommentNotFoundException.class})
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class})
+  @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class,
+      BookingConflictException.class})
   public ResponseEntity<ApiErrorResponse> handleConflict(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.CONFLICT, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler({InvalidBookingStateException.class, InvalidTicketStateException.class,
+      AttachmentLimitException.class})
+  public ResponseEntity<ApiErrorResponse> handleInvalidState(
+      RuntimeException exception, HttpServletRequest request) {
+    return build(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(CommentOwnershipException.class)
+  public ResponseEntity<ApiErrorResponse> handleForbidden(
+      CommentOwnershipException exception, HttpServletRequest request) {
+    return build(HttpStatus.FORBIDDEN, exception.getMessage(), request);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
