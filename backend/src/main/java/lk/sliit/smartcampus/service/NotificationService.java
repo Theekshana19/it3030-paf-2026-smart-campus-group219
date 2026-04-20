@@ -5,10 +5,10 @@ import lk.sliit.smartcampus.dto.response.NotificationResponse;
 
 public interface NotificationService {
 
-  List<NotificationResponse> getCurrentUserNotifications();
+  List<NotificationResponse> getCurrentUserNotifications(String googleToken);
 
-  void markAsRead(Long notificationId);
+  void markAsRead(Long notificationId, String googleToken);
 
-  void markAllAsRead();
+  void markAllAsRead(String googleToken);
 }
 

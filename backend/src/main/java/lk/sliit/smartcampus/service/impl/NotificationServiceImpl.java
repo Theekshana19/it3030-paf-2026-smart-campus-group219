@@ -27,16 +27,16 @@ public class NotificationServiceImpl implements NotificationService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<NotificationResponse> getCurrentUserNotifications() {
-    Long userId = resolveCurrentUserId();
+  public List<NotificationResponse> getCurrentUserNotifications(String googleToken) {
+    Long userId = resolveCurrentUserId(googleToken);
     return notificationRepository.findByUserUserIdOrderByCreatedAtDesc(userId).stream()
         .map(this::toResponse)
         .toList();
   }
 
   @Override
-  public void markAsRead(Long notificationId) {
-    Long userId = resolveCurrentUserId();
+  public void markAsRead(Long notificationId, String googleToken) {
+    Long userId = resolveCurrentUserId(googleToken);
     Notification notification =
         notificationRepository
             .findById(notificationId)
@@ -51,8 +51,8 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public void markAllAsRead() {
-    Long userId = resolveCurrentUserId();
+  public void markAllAsRead(String googleToken) {
+    Long userId = resolveCurrentUserId(googleToken);
     List<Notification> notifications = notificationRepository.findByUserUserIdOrderByCreatedAtDesc(userId);
     LocalDateTime now = LocalDateTime.now();
     boolean hasChanges = false;
@@ -68,15 +68,31 @@ public class NotificationServiceImpl implements NotificationService {
     }
   }
 
-  private Long resolveCurrentUserId() {
+  private Long resolveCurrentUserId(String googleToken) {
+    ParsedGoogleToken tokenData = parseGoogleToken(googleToken);
     User currentUser =
         userRepository
-            .findAll()
-            .stream()
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("No users found in the system"));
+            .findByGoogleSub(tokenData.sub())
+            .orElseThrow(() -> new IllegalArgumentException("User not found for the provided token"));
     return currentUser.getUserId();
   }
+
+  private ParsedGoogleToken parseGoogleToken(String googleToken) {
+    String trimmed = googleToken == null ? "" : googleToken.trim();
+    if (trimmed.isEmpty()) {
+      throw new IllegalArgumentException("googleToken is required");
+    }
+
+    String[] parts = trimmed.split("\\|", -1);
+    String sub = parts[0].trim();
+    if (sub.isEmpty()) {
+      throw new IllegalArgumentException("googleToken must include a subject");
+    }
+
+    return new ParsedGoogleToken(sub);
+  }
+
+  private record ParsedGoogleToken(String sub) {}
 
   private NotificationResponse toResponse(Notification entity) {
     return NotificationResponse.builder()
