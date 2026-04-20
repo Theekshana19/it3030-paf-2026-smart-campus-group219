@@ -18,7 +18,11 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({TagNotFoundException.class, ScheduleNotFoundException.class})
+  @ExceptionHandler({
+    TagNotFoundException.class,
+    ScheduleNotFoundException.class,
+    NotificationNotFoundException.class
+  })
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
