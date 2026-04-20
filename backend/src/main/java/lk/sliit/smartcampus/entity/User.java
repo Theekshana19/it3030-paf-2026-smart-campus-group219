@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Users")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,32 +27,32 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "UserId")
+  @Column(name = "user_id")
   private Long userId;
 
-  @Column(name = "GoogleSub", nullable = false, unique = true, length = 255)
+  @Column(name = "google_sub", nullable = false, unique = true, length = 255)
   private String googleSub;
 
-  @Column(name = "Email", nullable = false, unique = true, length = 255)
+  @Column(name = "email", nullable = false, unique = true, length = 255)
   private String email;
 
-  @Column(name = "DisplayName", nullable = false, length = 150)
+  @Column(name = "display_name", nullable = false, length = 150)
   private String displayName;
 
-  @Column(name = "ProfileImageUrl", length = 500)
+  @Column(name = "profile_image_url", length = 500)
   private String profileImageUrl;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "Role", nullable = false, length = 30)
+  @Column(name = "role", nullable = false, length = 30)
   private UserRole role;
 
-  @Column(name = "IsActive", nullable = false)
+  @Column(name = "is_active", nullable = false)
   private Boolean isActive;
 
-  @Column(name = "CreatedAt", nullable = false, updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "UpdatedAt", nullable = false)
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 }
 
