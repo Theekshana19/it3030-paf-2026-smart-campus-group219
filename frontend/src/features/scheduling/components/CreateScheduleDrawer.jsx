@@ -27,7 +27,7 @@ export default function CreateScheduleDrawer({ open, onClose, onCreated, initial
         className="fixed inset-0 bg-on-surface/45 backdrop-blur-[2px] z-50 transition-opacity"
         onClick={close}
       />
-      <aside className="fixed right-0 top-0 h-screen w-[480px] max-w-[92vw] bg-white/95 backdrop-blur-xl z-[60] shadow-[0_32px_64px_-12px_rgba(23,28,31,0.25)] flex flex-col font-body border-l border-white/20">
+      <aside className="fixed right-0 top-0 h-[100dvh] w-[480px] max-w-[92vw] bg-white/95 backdrop-blur-xl z-[60] shadow-[0_32px_64px_-12px_rgba(23,28,31,0.25)] flex flex-col font-body border-l border-white/20">
         <div className="p-8 pb-4 flex justify-between items-start">
           <div>
             <h2 className="text-2xl font-headline font-extrabold text-on-surface">
@@ -40,7 +40,7 @@ export default function CreateScheduleDrawer({ open, onClose, onCreated, initial
           </button>
         </div>
 
-        <form onSubmit={submit} className="flex-1 overflow-y-auto p-8 space-y-8 pb-32">
+        <form onSubmit={submit} className="flex-1 overflow-y-auto p-8 space-y-8 pb-6">
           <section className="space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Icon name="category" className="text-primary text-sm" />
@@ -139,7 +139,7 @@ export default function CreateScheduleDrawer({ open, onClose, onCreated, initial
           </section>
         </form>
 
-        <footer className="absolute bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-surface-container flex items-center justify-between gap-4">
+        <footer className="sticky bottom-0 z-10 p-6 pb-[max(1rem,env(safe-area-inset-bottom))] bg-white/80 backdrop-blur-md border-t border-surface-container flex items-center justify-between gap-4">
           <button
             type="button"
             className="flex-1 px-6 py-3 text-sm font-bold text-on-surface-variant hover:bg-surface-container rounded-xl transition-all"
