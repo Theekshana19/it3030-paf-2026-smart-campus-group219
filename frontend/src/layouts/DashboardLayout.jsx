@@ -6,7 +6,7 @@ export default function DashboardLayout() {
   return (
     <div className="bg-surface text-on-surface flex min-h-screen">
       <Sidebar />
-      <main className="ml-64 flex-1 flex flex-col min-h-screen">
+      <main className="ml-64 flex-1 flex flex-col min-h-screen min-w-0 overflow-x-hidden">
         <TopHeader />
         <Outlet />
       </main>

@@ -16,6 +16,15 @@ export default function BookingTable({ items, sortBy, sortDir, toggleSort, onDel
     <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container-high overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm font-body">
+          <colgroup>
+            <col className="w-[140px]" />
+            <col className="w-[18%]" />
+            <col className="w-[110px]" />
+            <col className="w-[110px]" />
+            <col />
+            <col className="w-[120px]" />
+            <col className="w-[80px]" />
+          </colgroup>
           <thead>
             <tr className="bg-surface-container-low/70 border-b border-surface-container-high">
               {headers.map((h) => (
