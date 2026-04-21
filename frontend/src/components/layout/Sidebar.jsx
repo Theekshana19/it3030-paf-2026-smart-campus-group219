@@ -38,7 +38,7 @@ function catalogueNavActive({ pathname }) {
 }
 
 function schedulingNavActive({ pathname }) {
-  return pathname === '/scheduling' || pathname.endsWith('/schedules');
+  return pathname === '/status-scheduling' || pathname === '/scheduling' || pathname.endsWith('/schedules');
 }
 
 export default function Sidebar() {
@@ -63,7 +63,7 @@ export default function Sidebar() {
         />
         <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
         <NavItem
-          to="/scheduling"
+          to="/status-scheduling"
           icon="calendar_today"
           label="Status Scheduling"
           isCustomActive={schedulingNavActive}

@@ -5,6 +5,7 @@ import ResourceCataloguePage from '../features/resources/pages/ResourceCatalogue
 import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage.jsx';
 import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
+import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -49,9 +50,14 @@ export const router = createBrowserRouter([
         handle: { crumb: 'Resource details' },
       },
       {
+        path: 'status-scheduling',
+        element: <StatusSchedulingOverviewPage />,
+        handle: { crumb: 'Status scheduling' },
+      },
+      {
         path: 'scheduling',
-        element: <PlaceholderPage title="Status scheduling" />,
-        handle: { crumb: 'Scheduling' },
+        element: <Navigate to="/status-scheduling" replace />,
+        handle: { crumb: 'Status scheduling' },
       },
       {
         path: 'tags',

@@ -3,7 +3,11 @@ package lk.sliit.smartcampus.repository;
 import java.time.LocalDate;
 import java.util.List;
 import lk.sliit.smartcampus.entity.ResourceStatusSchedule;
+import lk.sliit.smartcampus.enums.ResourceType;
+import lk.sliit.smartcampus.enums.ScheduledStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ResourceStatusScheduleRepository
     extends JpaRepository<ResourceStatusSchedule, Long> {
@@ -15,4 +19,26 @@ public interface ResourceStatusScheduleRepository
       Long resourceId, LocalDate scheduleDate);
 
   void deleteByResource_ResourceId(Long resourceId);
+
+  @Query("""
+      select s
+      from ResourceStatusSchedule s
+      join fetch s.resource r
+      where (:search is null or
+             lower(r.resourceName) like lower(concat('%', :search, '%')) or
+             lower(r.resourceCode) like lower(concat('%', :search, '%')))
+        and (:resourceType is null or r.resourceType = :resourceType)
+        and (:building is null or lower(r.building) = lower(:building))
+        and (:status is null or s.scheduledStatus = :status)
+        and (:fromDate is null or s.scheduleDate >= :fromDate)
+        and (:toDate is null or s.scheduleDate <= :toDate)
+      order by s.scheduleDate asc, s.startTime asc
+      """)
+  List<ResourceStatusSchedule> findForGlobalOverview(
+      @Param("search") String search,
+      @Param("resourceType") ResourceType resourceType,
+      @Param("building") String building,
+      @Param("status") ScheduledStatus status,
+      @Param("fromDate") LocalDate fromDate,
+      @Param("toDate") LocalDate toDate);
 }
