@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../../features/auth/hooks/useAuth.js';
 import Icon from '../common/Icon.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const navItemClass =
   'text-slate-300 hover:text-white flex items-center px-4 py-3 mx-2 my-1 transition-all hover:bg-[#4F46E5]/20 cursor-pointer rounded-lg group';
@@ -43,7 +44,8 @@ function schedulingNavActive({ pathname }) {
 }
 
 export default function Sidebar() {
-  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
   const isAdmin = currentUser?.role === 'ADMIN';
 
   return (
@@ -72,6 +74,9 @@ export default function Sidebar() {
           label="Status Scheduling"
           isCustomActive={schedulingNavActive}
         />
+        <NavItem to="/notifications" icon="notifications" label="Notifications" />
+        <NavItem to="/bookings" icon="event" label="Bookings" />
+        <NavItem to="/tickets" icon="confirmation_number" label="Tickets" />
         <NavItem to="/tags" icon="sell" label="Tag Management" />
         {isAdmin ? <NavItem to="/users" icon="group" label="User Management" /> : null}
         <NavItem to="/settings" icon="settings" label="Settings" />
@@ -89,10 +94,17 @@ export default function Sidebar() {
           <Icon name="contact_support" className="mr-3 text-sm" />
           <span className="font-manrope text-sm tracking-wide">Support</span>
         </div>
-        <div className="text-slate-300 hover:text-white flex items-center px-4 py-2 mx-2 cursor-pointer rounded-lg group">
+        <button
+          type="button"
+          className="w-full text-left text-slate-300 hover:text-white flex items-center px-4 py-2 mx-2 cursor-pointer rounded-lg group"
+          onClick={() => {
+            logout();
+            navigate('/login', { replace: true });
+          }}
+        >
           <Icon name="logout" className="mr-3 text-sm" />
           <span className="font-manrope text-sm tracking-wide">Logout</span>
-        </div>
+        </button>
       </div>
     </aside>
   );

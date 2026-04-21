@@ -3,11 +3,17 @@ import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.jsx';
 import { useAuth } from '../features/auth/hooks/useAuth.js';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
+import RegisterPage from '../features/auth/pages/RegisterPage.jsx';
+import NotificationsPage from '../features/notifications/pages/NotificationsPage.jsx';
+import BookingsPage from '../features/bookings/pages/BookingsPage.jsx';
+import TicketsPage from '../features/tickets/pages/TicketsPage.jsx';
+import TicketDetailPage from '../features/tickets/pages/TicketDetailPage.jsx';
 import AddResourcePage from '../features/resources/pages/AddResourcePage.jsx';
 import ResourceCataloguePage from '../features/resources/pages/ResourceCataloguePage.jsx';
 import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage.jsx';
 import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
+import UserManagementPage from '../features/users/pages/UserManagementPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -34,6 +40,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
   },
   {
     path: '/',
@@ -85,10 +95,30 @@ export const router = createBrowserRouter([
         handle: { crumb: 'Settings' },
       },
       {
+        path: 'notifications',
+        element: <NotificationsPage />,
+        handle: { crumb: 'Notifications' },
+      },
+      {
+        path: 'bookings',
+        element: <BookingsPage />,
+        handle: { crumb: 'Bookings' },
+      },
+      {
+        path: 'tickets',
+        element: <TicketsPage />,
+        handle: { crumb: 'Tickets' },
+      },
+      {
+        path: 'tickets/:ticketId',
+        element: <TicketDetailPage />,
+        handle: { crumb: 'Ticket' },
+      },
+      {
         path: 'users',
         element: (
           <AdminRoute>
-            <PlaceholderPage title="User management" />
+            <UserManagementPage />
           </AdminRoute>
         ),
         handle: { crumb: 'Users' },

@@ -8,6 +8,17 @@ const httpClient = axios.create({
   timeout: 60000,
 });
 
+httpClient.interceptors.request.use((config) => {
+  if (typeof config.url === 'string' && config.url.includes('/api/auth/google')) {
+    return config;
+  }
+  const token = localStorage.getItem('googleToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 /**
  * @param {import('axios').AxiosError} error
  * @returns {string}

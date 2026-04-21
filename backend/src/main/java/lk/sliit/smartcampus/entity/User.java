@@ -42,6 +42,9 @@ public class User {
   @Column(name = "profile_image_url", length = 500)
   private String profileImageUrl;
 
+  @Column(name = "password_hash", length = 255)
+  private String passwordHash;
+
   @Enumerated(EnumType.STRING)
   @Column(name = "role", nullable = false, length = 30)
   private UserRole role;

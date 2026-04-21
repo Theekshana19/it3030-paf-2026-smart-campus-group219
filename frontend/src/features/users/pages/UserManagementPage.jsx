@@ -1,15 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getUsers, updateUserRole } from '../api/usersApi.js';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 
 const ROLE_OPTIONS = ['USER', 'ADMIN', 'TECHNICIAN'];
 
 export default function UserManagementPage() {
+  const { currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyUserId, setBusyUserId] = useState(null);
 
+  const hasSession = Boolean(currentUser?.googleToken ?? localStorage.getItem('googleToken'));
+
   const loadUsers = useCallback(async () => {
+    if (!hasSession) {
+      setUsers([]);
+      setError('Please sign in first.');
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -21,13 +31,14 @@ export default function UserManagementPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hasSession]);
 
   useEffect(() => {
     loadUsers();
   }, [loadUsers]);
 
   const handleRoleChange = useCallback(async (userId, role) => {
+    if (!hasSession) return;
     setBusyUserId(userId);
     setError('');
     try {
@@ -40,10 +51,10 @@ export default function UserManagementPage() {
     } finally {
       setBusyUserId(null);
     }
-  }, []);
+  }, [hasSession]);
 
   return (
-    <div className="p-6 md:p-8 max-w-[1440px] mx-auto w-full space-y-6">
+    <div className="sc-page">
       <div className="space-y-1">
         <h2 className="text-2xl md:text-3xl font-bold font-headline text-on-surface tracking-tight">
           User management
@@ -53,16 +64,16 @@ export default function UserManagementPage() {
         </p>
       </div>
 
-      <section className="rounded-2xl border border-outline-variant/30 bg-surface-container-low p-4 md:p-6">
+      <section className="sc-panel p-4 md:p-6">
         {error ? (
           <div className="mb-4 rounded-lg border border-error/30 bg-error-container/40 px-3 py-2 text-xs text-on-error-container">
             {error}
           </div>
         ) : null}
 
-        <div className="overflow-x-auto rounded-xl border border-outline-variant/30 bg-white">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-surface-container text-on-surface-variant">
+            <thead className="bg-slate-50 text-slate-600">
               <tr>
                 <th className="text-left font-semibold px-4 py-3">Name</th>
                 <th className="text-left font-semibold px-4 py-3">Email</th>
@@ -79,12 +90,12 @@ export default function UserManagementPage() {
                 </tr>
               ) : users.length ? (
                 users.map((user) => (
-                  <tr key={user.userId} className="border-t border-outline-variant/20">
+                  <tr key={user.userId} className="border-t border-slate-200/80">
                     <td className="px-4 py-3 text-on-surface font-medium">{user.displayName}</td>
                     <td className="px-4 py-3 text-on-surface-variant">{user.email}</td>
                     <td className="px-4 py-3 text-on-surface">
                       <select
-                        className="rounded-md border border-outline-variant/50 px-2.5 py-1.5 bg-white text-sm"
+                        className="rounded-lg border border-slate-300 px-2.5 py-1.5 bg-white text-sm outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
                         value={user.role ?? 'USER'}
                         onChange={(e) => handleRoleChange(user.userId, e.target.value)}
                         disabled={busyUserId === user.userId}

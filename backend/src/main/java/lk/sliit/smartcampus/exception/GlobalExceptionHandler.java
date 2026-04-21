@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -21,11 +22,24 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({
     TagNotFoundException.class,
     ScheduleNotFoundException.class,
-    NotificationNotFoundException.class
+    NotificationNotFoundException.class,
+    BookingNotFoundException.class,
+    TicketNotFoundException.class
   })
   public ResponseEntity<ApiErrorResponse> handleNotFound(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ApiErrorResponse> handleAccessDenied(
+      AccessDeniedException exception, HttpServletRequest request) {
+    return build(
+        HttpStatus.FORBIDDEN,
+        exception.getMessage() != null && !exception.getMessage().isBlank()
+            ? exception.getMessage()
+            : "Forbidden",
+        request);
   }
 
   @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class})

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import NotificationsPanel from '../components/NotificationsPanel.jsx';
 import { useAuth } from '../../auth/hooks/useAuth.js';
 import {
+  deleteNotification,
   getNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
@@ -13,21 +14,22 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
+  const [busyDeleteId, setBusyDeleteId] = useState(null);
   const [markAllBusy, setMarkAllBusy] = useState(false);
 
-  const googleToken = currentUser?.googleToken ?? localStorage.getItem('googleToken') ?? '';
+  const hasSession = Boolean(currentUser?.googleToken ?? localStorage.getItem('googleToken'));
 
   const loadNotifications = useCallback(async () => {
-    if (!googleToken) {
+    if (!hasSession) {
       setNotifications([]);
-      setError('Google token not found. Please login first.');
+      setError('Please sign in to view notifications.');
       setLoading(false);
       return;
     }
     setLoading(true);
     setError('');
     try {
-      const data = await getNotifications(googleToken);
+      const data = await getNotifications();
       setNotifications(Array.isArray(data) ? data : []);
     } catch (e) {
       setError(e?.response?.data?.message || e?.message || 'Failed to load notifications.');
@@ -35,40 +37,49 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [googleToken]);
+  }, [hasSession]);
 
   useEffect(() => {
     loadNotifications();
   }, [loadNotifications]);
 
-  const handleMarkAsRead = useCallback(
-    async (notificationId) => {
-      if (!googleToken || notificationId == null) return;
-      setBusyId(notificationId);
-      try {
-        await markNotificationAsRead(notificationId, googleToken);
-        setNotifications((prev) =>
-          prev.map((n) =>
-            (n.notificationId ?? n.id) === notificationId ? { ...n, isRead: true, readAt: new Date() } : n
-          )
-        );
-      } finally {
-        setBusyId(null);
-      }
-    },
-    [googleToken]
-  );
+  const handleMarkAsRead = useCallback(async (notificationId) => {
+    if (notificationId == null) return;
+    setBusyId(notificationId);
+    try {
+      await markNotificationAsRead(notificationId);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          (n.notificationId ?? n.id) === notificationId ? { ...n, isRead: true, readAt: new Date() } : n
+        )
+      );
+    } finally {
+      setBusyId(null);
+    }
+  }, []);
 
   const handleMarkAllAsRead = useCallback(async () => {
-    if (!googleToken) return;
     setMarkAllBusy(true);
     try {
-      await markAllNotificationsAsRead(googleToken);
+      await markAllNotificationsAsRead();
       setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true, readAt: n.readAt ?? new Date() })));
     } finally {
       setMarkAllBusy(false);
     }
-  }, [googleToken]);
+  }, []);
+
+  const handleDelete = useCallback(async (notificationId) => {
+    if (notificationId == null) return;
+    setBusyDeleteId(notificationId);
+    try {
+      await deleteNotification(notificationId);
+      setNotifications((prev) => prev.filter((n) => (n.notificationId ?? n.id) !== notificationId));
+    } catch (e) {
+      setError(e?.response?.data?.message || e?.message || 'Failed to delete notification.');
+    } finally {
+      setBusyDeleteId(null);
+    }
+  }, []);
 
   const unreadCount = useMemo(
     () => notifications.filter((n) => !Boolean(n.isRead)).length,
@@ -103,7 +114,9 @@ export default function NotificationsPage() {
           loading={loading}
           onMarkAsRead={handleMarkAsRead}
           onMarkAllAsRead={handleMarkAllAsRead}
+          onDelete={handleDelete}
           busyId={busyId}
+          busyDeleteId={busyDeleteId}
           markAllBusy={markAllBusy}
         />
       </section>

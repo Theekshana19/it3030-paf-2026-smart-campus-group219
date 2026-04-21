@@ -8,12 +8,7 @@ export async function loginWithGoogle(payload) {
   return data;
 }
 
-/**
- * @param {string} googleToken
- */
-export async function getCurrentUser(googleToken) {
-  const { data } = await httpClient.get('/api/auth/me', {
-    params: { googleToken },
-  });
+export async function getCurrentUser() {
+  const { data } = await httpClient.get('/api/auth/me');
   return data;
 }

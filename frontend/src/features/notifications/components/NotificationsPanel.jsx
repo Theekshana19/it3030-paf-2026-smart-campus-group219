@@ -5,7 +5,9 @@ export default function NotificationsPanel({
   loading = false,
   onMarkAsRead,
   onMarkAllAsRead,
+  onDelete,
   busyId = null,
+  busyDeleteId = null,
   markAllBusy = false,
 }) {
   if (loading) {
@@ -56,27 +58,48 @@ export default function NotificationsPanel({
       </div>
 
       <ul className="max-h-96 overflow-auto divide-y divide-outline-variant/20">
-        {notifications.map((item) => (
-          <li
-            key={item.id ?? item.notificationId ?? `${item.title}-${item.createdAt}`}
-            className="px-4 py-3 flex items-start justify-between gap-3"
-          >
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-on-surface">{item.title ?? 'Notification'}</p>
-              <p className="text-xs text-on-surface-variant mt-0.5">
-                {item.message ?? 'You have a new update.'}
-              </p>
-            </div>
-            <button
-              type="button"
-              className="text-xs font-medium text-primary whitespace-nowrap disabled:opacity-50"
-              onClick={() => onMarkAsRead?.(item.notificationId ?? item.id)}
-              disabled={busyId === (item.notificationId ?? item.id) || Boolean(item.isRead)}
-            >
-              {item.isRead ? 'Read' : busyId === (item.notificationId ?? item.id) ? 'Saving...' : 'Mark read'}
-            </button>
-          </li>
-        ))}
+        {notifications.map((item) => {
+          const nid = item.notificationId ?? item.id;
+          return (
+            <li key={item.id ?? item.notificationId ?? `${item.title}-${item.createdAt}`} className="px-4 py-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium text-on-surface">{item.title ?? 'Notification'}</p>
+                  <p className="text-xs text-on-surface-variant mt-0.5">
+                    {item.message ?? 'You have a new update.'}
+                  </p>
+                  {item.type ? (
+                    <p className="text-[10px] uppercase tracking-wide text-on-surface-variant/80 mt-1">
+                      {item.type}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex flex-col gap-1 items-end shrink-0">
+                  <button
+                    type="button"
+                    className="text-xs font-medium text-primary whitespace-nowrap disabled:opacity-50"
+                    onClick={() => onMarkAsRead?.(nid)}
+                    disabled={busyId === nid || Boolean(item.isRead)}
+                  >
+                    {item.isRead ? 'Read' : busyId === nid ? 'Saving...' : 'Mark read'}
+                  </button>
+                  {onDelete ? (
+                    <button
+                      type="button"
+                      className="text-xs font-medium text-error/90 whitespace-nowrap disabled:opacity-50 inline-flex items-center gap-0.5"
+                      onClick={() => onDelete(nid)}
+                      disabled={busyDeleteId === nid}
+                      title="Remove notification"
+                    >
+                      <Icon name="delete" className="text-[14px]" />
+                      {busyDeleteId === nid ? '…' : 'Remove'}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
