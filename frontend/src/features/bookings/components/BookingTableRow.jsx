@@ -36,14 +36,14 @@ export default function BookingTableRow({ booking, onDelete }) {
 
       {/* resource */}
       <td className="px-4 py-3.5">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
           <div className="w-7 h-7 rounded-lg bg-secondary-container flex items-center justify-center flex-shrink-0">
             <Icon name="meeting_room" className="text-sm text-on-secondary-container" />
           </div>
-          <div>
-            <div className="text-sm font-semibold text-on-surface leading-tight">{booking.resourceName}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold text-on-surface leading-tight truncate">{booking.resourceName}</div>
             {booking.building && (
-              <div className="text-xs text-on-surface-variant">{booking.building}</div>
+              <div className="text-xs text-on-surface-variant truncate">{booking.building}</div>
             )}
           </div>
         </div>
@@ -69,11 +69,11 @@ export default function BookingTableRow({ booking, onDelete }) {
 
       {/* user */}
       <td className="px-4 py-3.5">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-hidden">
           <UserAvatar name={booking.userName} />
-          <div>
-            <div className="text-sm font-medium text-on-surface leading-tight">{booking.userName}</div>
-            <div className="text-xs text-on-surface-variant">{booking.userEmail}</div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-on-surface leading-tight truncate">{booking.userName}</div>
+            <div className="text-xs text-on-surface-variant truncate">{booking.userEmail}</div>
           </div>
         </div>
       </td>

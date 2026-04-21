@@ -109,19 +109,20 @@ export default function TicketAdminPanel({ ticket, onUpdated }) {
               <input type="email" value={technicianEmail} onChange={(e) => setTechnicianEmail(e.target.value)} className={inputClass} placeholder="Enter email" />
             </div>
           </div>
-          <div className="flex gap-3">
-            <button type="button" disabled={loading} onClick={handleAssign}
-              className="flex items-center gap-2 bg-primary-container text-on-primary px-5 py-2.5 rounded-lg font-bold text-sm font-manrope hover:opacity-90 disabled:opacity-50">
-              <Icon name="person_add" className="text-lg" /> Assign Technician
-            </button>
+          <button type="button" disabled={loading} onClick={handleAssign}
+            className="flex items-center gap-2 bg-primary-container text-on-primary px-5 py-2.5 rounded-lg font-bold text-sm font-manrope hover:opacity-90 disabled:opacity-50">
+            <Icon name="person_add" className="text-lg" /> Assign Technician
+          </button>
+
+          <div className="border-t border-surface-container-high pt-4 space-y-3">
+            <div>
+              <label className={labelClass}>Reject Reason (required to reject)</label>
+              <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className={inputClass} rows={2} placeholder="Reason for rejection..." />
+            </div>
             <button type="button" disabled={loading} onClick={handleReject}
               className="flex items-center gap-2 bg-error text-on-error px-5 py-2.5 rounded-lg font-bold text-sm font-manrope hover:opacity-90 disabled:opacity-50">
-              <Icon name="block" className="text-lg" /> Reject
+              <Icon name="block" className="text-lg" /> Reject Ticket
             </button>
-          </div>
-          <div>
-            <label className={labelClass}>Reject Reason (if rejecting)</label>
-            <textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className={inputClass} rows={2} placeholder="Reason for rejection..." />
           </div>
         </div>
       )}
