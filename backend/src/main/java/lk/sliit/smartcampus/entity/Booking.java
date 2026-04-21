@@ -52,10 +52,10 @@ public class Booking {
   @Column(name = "BookingDate", nullable = false)
   private LocalDate bookingDate;
 
-  @Column(name = "StartTime", nullable = false)
+  @Column(name = "StartTime", nullable = false, columnDefinition = "time")
   private LocalTime startTime;
 
-  @Column(name = "EndTime", nullable = false)
+  @Column(name = "EndTime", nullable = false, columnDefinition = "time")
   private LocalTime endTime;
 
   @Column(name = "Purpose", nullable = false, length = 500)

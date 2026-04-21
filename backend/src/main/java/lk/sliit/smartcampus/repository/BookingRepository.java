@@ -1,7 +1,6 @@
 package lk.sliit.smartcampus.repository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import lk.sliit.smartcampus.entity.Booking;
 import lk.sliit.smartcampus.enums.BookingStatus;
@@ -17,16 +16,18 @@ public interface BookingRepository
   boolean existsByBookingRefIgnoreCase(String bookingRef);
 
   // find overlapping approved bookings for conflict detection
-  @Query("SELECT b FROM Booking b WHERE b.resource.resourceId = :resourceId "
-      + "AND b.bookingDate = :date "
-      + "AND b.bookingStatus = 'APPROVED' "
-      + "AND b.startTime < :endTime "
-      + "AND b.endTime > :startTime")
+  // native query with CAST avoids Hibernate binding LocalTime as datetime2 in SQL Server
+  @Query(value = "SELECT * FROM bookings WHERE resource_id = :resourceId "
+      + "AND booking_date = :date "
+      + "AND booking_status = 'APPROVED' "
+      + "AND start_time < CAST(:endTime AS time) "
+      + "AND end_time > CAST(:startTime AS time)",
+      nativeQuery = true)
   List<Booking> findOverlapping(
       @Param("resourceId") Long resourceId,
       @Param("date") LocalDate date,
-      @Param("startTime") LocalTime startTime,
-      @Param("endTime") LocalTime endTime);
+      @Param("startTime") String startTime,
+      @Param("endTime") String endTime);
 
   // count bookings for a resource on a specific date
   long countByResource_ResourceIdAndBookingDateAndBookingStatus(

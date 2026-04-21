@@ -72,8 +72,8 @@ public class BookingServiceImpl implements BookingService {
     List<Booking> conflicts = bookingRepository.findOverlapping(
         resource.getResourceId(),
         request.getBookingDate(),
-        request.getStartTime(),
-        request.getEndTime());
+        request.getStartTime().toString(),
+        request.getEndTime().toString());
 
     if (!conflicts.isEmpty()) {
       Booking first = conflicts.get(0);
@@ -113,8 +113,8 @@ public class BookingServiceImpl implements BookingService {
     List<Booking> conflicts = bookingRepository.findOverlapping(
         resource.getResourceId(),
         request.getBookingDate(),
-        request.getStartTime(),
-        request.getEndTime());
+        request.getStartTime().toString(),
+        request.getEndTime().toString());
 
     conflicts.removeIf(b -> b.getBookingId().equals(bookingId));
 
@@ -244,7 +244,7 @@ public class BookingServiceImpl implements BookingService {
       Long resourceId, LocalDate date, LocalTime startTime, LocalTime endTime) {
 
     List<Booking> conflicts = bookingRepository.findOverlapping(
-        resourceId, date, startTime, endTime);
+        resourceId, date, startTime.toString(), endTime.toString());
 
     if (conflicts.isEmpty()) {
       return Collections.emptyList();
@@ -271,7 +271,7 @@ public class BookingServiceImpl implements BookingService {
         .filter(r -> r.getStatus() == ResourceStatus.ACTIVE)
         .filter(r -> {
           List<Booking> otherConflicts = bookingRepository.findOverlapping(
-              r.getResourceId(), date, startTime, endTime);
+              r.getResourceId(), date, startTime.toString(), endTime.toString());
           return otherConflicts.isEmpty();
         })
         .map(r -> r.getResourceName()

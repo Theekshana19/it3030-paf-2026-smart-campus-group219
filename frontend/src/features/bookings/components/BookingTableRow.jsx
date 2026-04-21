@@ -2,43 +2,97 @@ import { useNavigate } from 'react-router-dom';
 import BookingStatusBadge from './BookingStatusBadge.jsx';
 import Icon from '../../../components/common/Icon.jsx';
 
-// single row in the booking table
+function UserAvatar({ name }) {
+  const initials = name
+    ? name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+    : '?';
+  return (
+    <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+      <span className="text-xs font-bold text-primary font-manrope">{initials}</span>
+    </div>
+  );
+}
+
 export default function BookingTableRow({ booking, onDelete }) {
   const navigate = useNavigate();
-
-  // format time like 09:00
-  const formatTime = (t) => (t ? t.slice(0, 5) : '');
+  const formatTime = (t) => (t ? t.slice(0, 5) : '–');
+  const formatDate = (d) => {
+    if (!d) return '–';
+    const [y, m, day] = d.split('-');
+    return `${day}/${m}/${y}`;
+  };
 
   return (
     <tr
-      className="border-b border-surface-container-high hover:bg-surface-container-low transition-colors cursor-pointer"
+      className="group border-b border-surface-container-high/60 hover:bg-primary/[0.03] transition-colors cursor-pointer"
       onClick={() => navigate(`/bookings/${booking.bookingId}`)}
     >
-      <td className="px-4 py-3 font-medium text-primary">{booking.bookingRef}</td>
-      <td className="px-4 py-3">
-        <div className="font-medium text-on-surface">{booking.resourceName}</div>
-        <div className="text-xs text-on-surface-variant">{booking.building}</div>
+      {/* ref */}
+      <td className="px-4 py-3.5">
+        <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-primary bg-primary/8 px-2 py-0.5 rounded-md">
+          {booking.bookingRef}
+        </span>
       </td>
-      <td className="px-4 py-3 text-on-surface">{booking.bookingDate}</td>
-      <td className="px-4 py-3 text-on-surface">
-        {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
+
+      {/* resource */}
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <div className="w-7 h-7 rounded-lg bg-secondary-container flex items-center justify-center flex-shrink-0">
+            <Icon name="meeting_room" className="text-sm text-on-secondary-container" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-semibold text-on-surface leading-tight truncate">{booking.resourceName}</div>
+            {booking.building && (
+              <div className="text-xs text-on-surface-variant truncate">{booking.building}</div>
+            )}
+          </div>
+        </div>
       </td>
-      <td className="px-4 py-3">
-        <div className="text-on-surface">{booking.userName}</div>
-        <div className="text-xs text-on-surface-variant">{booking.userEmail}</div>
+
+      {/* date */}
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-1.5">
+          <Icon name="calendar_today" className="text-sm text-on-surface-variant/60" />
+          <span className="text-sm text-on-surface">{formatDate(booking.bookingDate)}</span>
+        </div>
       </td>
-      <td className="px-4 py-3">
+
+      {/* time */}
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-1.5">
+          <Icon name="schedule" className="text-sm text-on-surface-variant/60" />
+          <span className="text-sm text-on-surface font-mono">
+            {formatTime(booking.startTime)} – {formatTime(booking.endTime)}
+          </span>
+        </div>
+      </td>
+
+      {/* user */}
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-2 overflow-hidden">
+          <UserAvatar name={booking.userName} />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-on-surface leading-tight truncate">{booking.userName}</div>
+            <div className="text-xs text-on-surface-variant truncate">{booking.userEmail}</div>
+          </div>
+        </div>
+      </td>
+
+      {/* status */}
+      <td className="px-4 py-3.5">
         <BookingStatusBadge status={booking.bookingStatus} />
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+
+      {/* actions */}
+      <td className="px-4 py-3.5">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={() => navigate(`/bookings/${booking.bookingId}`)}
             className="p-1.5 rounded-lg hover:bg-surface-container-high transition-colors"
             title="View details"
           >
-            <Icon name="visibility" className="text-lg text-on-surface-variant" />
+            <Icon name="open_in_new" className="text-base text-on-surface-variant" />
           </button>
           {booking.bookingStatus === 'PENDING' && (
             <button
@@ -47,16 +101,16 @@ export default function BookingTableRow({ booking, onDelete }) {
               className="p-1.5 rounded-lg hover:bg-surface-container-high transition-colors"
               title="Edit booking"
             >
-              <Icon name="edit" className="text-lg text-on-surface-variant" />
+              <Icon name="edit" className="text-base text-on-surface-variant" />
             </button>
           )}
           <button
             type="button"
             onClick={() => onDelete(booking.bookingId, booking.bookingRef)}
-            className="p-1.5 rounded-lg hover:bg-error-container transition-colors"
+            className="p-1.5 rounded-lg hover:bg-red-50 transition-colors"
             title="Delete booking"
           >
-            <Icon name="delete" className="text-lg text-error" />
+            <Icon name="delete_outline" className="text-base text-error" />
           </button>
         </div>
       </td>
