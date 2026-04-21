@@ -314,3 +314,22 @@ export async function createGlobalSchedule(payload) {
   });
   return data;
 }
+
+export async function updateGlobalSchedule(payload) {
+  const { resourceId, scheduleId, scheduleDate, startTime, endTime, scheduledStatus, reasonNote, isActive = true } = payload;
+  if (!resourceId || !scheduleId) throw new Error('Resource and schedule are required');
+  const { data } = await httpClient.put(`/api/resources/${resourceId}/status-schedules/${scheduleId}`, {
+    scheduleDate,
+    startTime: toBackendTime(startTime),
+    endTime: toBackendTime(endTime),
+    scheduledStatus,
+    reasonNote: reasonNote ? String(reasonNote).trim() : '',
+    isActive,
+  });
+  return data;
+}
+
+export async function deleteGlobalSchedule({ resourceId, scheduleId }) {
+  if (!resourceId || !scheduleId) throw new Error('Resource and schedule are required');
+  await httpClient.delete(`/api/resources/${resourceId}/status-schedules/${scheduleId}`);
+}

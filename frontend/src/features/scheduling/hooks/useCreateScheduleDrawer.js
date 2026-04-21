@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { getErrorMessage } from '../../../services/httpClient.js';
-import { checkScheduleOverlap, createGlobalSchedule, listDrawerResources } from '../api/schedulingService.js';
+import { checkScheduleOverlap, createGlobalSchedule, listDrawerResources, updateGlobalSchedule } from '../api/schedulingService.js';
 
 const schema = z
   .object({
@@ -40,7 +40,7 @@ const defaultValues = {
   highPriority: false,
 };
 
-export default function useCreateScheduleDrawer({ open, onClose, onCreated }) {
+export default function useCreateScheduleDrawer({ open, onClose, onCreated, initialSchedule }) {
   const [resources, setResources] = useState([]);
   const [loadingResources, setLoadingResources] = useState(false);
   const [conflict, setConflict] = useState(null);
@@ -78,6 +78,24 @@ export default function useCreateScheduleDrawer({ open, onClose, onCreated }) {
   }, [open, loadResources]);
 
   useEffect(() => {
+    if (!open) return;
+    if (!initialSchedule) {
+      reset(defaultValues);
+      return;
+    }
+    reset({
+      resourceId: String(initialSchedule.resourceId || ''),
+      scheduleDate: initialSchedule.scheduleDate || today(),
+      startTime: String(initialSchedule.startTime || '').slice(0, 5),
+      endTime: String(initialSchedule.endTime || '').slice(0, 5),
+      scheduledStatus: initialSchedule.targetStatus === 'ACTIVE' ? 'ACTIVE' : 'OUT_OF_SERVICE',
+      reasonNote: initialSchedule.reasonNote || '',
+      notifyAffectedUsers: true,
+      highPriority: false,
+    });
+  }, [open, initialSchedule, reset]);
+
+  useEffect(() => {
     if (!open || !values.resourceId || !values.scheduleDate || !values.startTime || !values.endTime) {
       setConflict(null);
       return;
@@ -90,6 +108,7 @@ export default function useCreateScheduleDrawer({ open, onClose, onCreated }) {
           scheduleDate: values.scheduleDate,
           startTime: values.startTime,
           endTime: values.endTime,
+          ignoreScheduleId: initialSchedule?.scheduleId,
         });
         if (!cancelled) setConflict(result);
       } catch {
@@ -100,12 +119,12 @@ export default function useCreateScheduleDrawer({ open, onClose, onCreated }) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [open, values.resourceId, values.scheduleDate, values.startTime, values.endTime]);
+  }, [open, values.resourceId, values.scheduleDate, values.startTime, values.endTime, initialSchedule?.scheduleId]);
 
   const submit = handleSubmit(async (payload) => {
     setSubmitting(true);
     try {
-      await createGlobalSchedule({
+      const request = {
         resourceId: Number(payload.resourceId),
         scheduleDate: payload.scheduleDate,
         startTime: payload.startTime,
@@ -113,8 +132,13 @@ export default function useCreateScheduleDrawer({ open, onClose, onCreated }) {
         scheduledStatus: payload.scheduledStatus,
         reasonNote: payload.reasonNote || '',
         isActive: true,
-      });
-      toast.success('Schedule created successfully');
+      };
+      if (initialSchedule?.scheduleId) {
+        await updateGlobalSchedule({ ...request, scheduleId: initialSchedule.scheduleId });
+      } else {
+        await createGlobalSchedule(request);
+      }
+      toast.success(initialSchedule?.scheduleId ? 'Schedule updated successfully' : 'Schedule created successfully');
       onCreated?.();
       onClose?.();
       reset(defaultValues);

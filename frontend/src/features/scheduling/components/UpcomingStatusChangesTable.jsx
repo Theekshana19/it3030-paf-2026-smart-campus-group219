@@ -18,9 +18,18 @@ function LoadingRows() {
  * @param {{
  *   rows: Array<Record<string, any>>;
  *   loading?: boolean;
+ *   deletingScheduleId?: number|null;
+ *   onEdit?: (row: Record<string, any>) => void;
+ *   onDelete?: (row: Record<string, any>) => void;
  * }} props
  */
-export default function UpcomingStatusChangesTable({ rows, loading = false }) {
+export default function UpcomingStatusChangesTable({
+  rows,
+  loading = false,
+  deletingScheduleId = null,
+  onEdit,
+  onDelete,
+}) {
   return (
     <div className="bg-surface-container-lowest rounded-xl shadow-[0_8px_32px_rgba(23,28,31,0.04)] overflow-hidden border border-white">
       <div className="px-6 py-5 border-b border-surface-container flex items-center justify-between bg-white/50">
@@ -43,7 +52,16 @@ export default function UpcomingStatusChangesTable({ rows, loading = false }) {
           </thead>
           <tbody className="divide-y divide-surface-container">
             {loading ? <LoadingRows /> : null}
-            {!loading && rows.map((row) => <UpcomingStatusChangeRow key={`${row.scheduleId}-${row.resourceId}`} row={row} />)}
+            {!loading &&
+              rows.map((row) => (
+                <UpcomingStatusChangeRow
+                  key={`${row.scheduleId}-${row.resourceId}`}
+                  row={row}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  deleting={Number(deletingScheduleId) === Number(row.scheduleId)}
+                />
+              ))}
             {!loading && rows.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-16 text-center">

@@ -3,9 +3,9 @@ import ConflictIndicator from './ConflictIndicator.jsx';
 import SchedulingStatusBadge from './SchedulingStatusBadge.jsx';
 
 /**
- * @param {{ row: Record<string, any> }} props
+ * @param {{ row: Record<string, any>; onEdit?: (row: Record<string, any>) => void; onDelete?: (row: Record<string, any>) => void; deleting?: boolean }} props
  */
-export default function UpcomingStatusChangeRow({ row }) {
+export default function UpcomingStatusChangeRow({ row, onEdit, onDelete, deleting = false }) {
   return (
     <tr className="hover:bg-surface-container-low transition-colors">
       <td className="px-6 py-5">
@@ -26,9 +26,25 @@ export default function UpcomingStatusChangeRow({ row }) {
         <ConflictIndicator hasConflict={row.hasConflict} />
       </td>
       <td className="px-6 py-5 text-right">
-        <button type="button" className="p-2 hover:bg-white rounded-full transition-colors" aria-label="Row actions">
-          <Icon name="more_vert" className="text-slate-400" />
-        </button>
+        <div className="inline-flex items-center gap-1">
+          <button
+            type="button"
+            className="p-2 hover:bg-white rounded-full transition-colors"
+            aria-label="Edit schedule"
+            onClick={() => onEdit?.(row)}
+          >
+            <Icon name="edit" className="text-slate-500 text-[20px]" />
+          </button>
+          <button
+            type="button"
+            className="p-2 hover:bg-white rounded-full transition-colors"
+            aria-label="Delete schedule"
+            onClick={() => onDelete?.(row)}
+            disabled={deleting}
+          >
+            <Icon name={deleting ? 'hourglass_top' : 'delete'} className="text-error text-[20px]" />
+          </button>
+        </div>
       </td>
     </tr>
   );

@@ -6,11 +6,11 @@ import ScheduleConflictWarning from './ScheduleConflictWarning.jsx';
 import ScheduleToggleField from './ScheduleToggleField.jsx';
 
 /**
- * @param {{ open: boolean; onClose: () => void; onCreated: () => void; }} props
+ * @param {{ open: boolean; onClose: () => void; onCreated: () => void; initialSchedule?: Record<string, any>|null; }} props
  */
-export default function CreateScheduleDrawer({ open, onClose, onCreated }) {
+export default function CreateScheduleDrawer({ open, onClose, onCreated, initialSchedule = null }) {
   const { form, values, selectedResource, resources, loadingResources, conflict, submitting, submit, close, setValue } =
-    useCreateScheduleDrawer({ open, onClose, onCreated });
+    useCreateScheduleDrawer({ open, onClose, onCreated, initialSchedule });
 
   const {
     register,
@@ -30,7 +30,9 @@ export default function CreateScheduleDrawer({ open, onClose, onCreated }) {
       <aside className="fixed right-0 top-0 h-screen w-[480px] max-w-[92vw] bg-white/95 backdrop-blur-xl z-[60] shadow-[0_32px_64px_-12px_rgba(23,28,31,0.25)] flex flex-col font-body border-l border-white/20">
         <div className="p-8 pb-4 flex justify-between items-start">
           <div>
-            <h2 className="text-2xl font-headline font-extrabold text-on-surface">Create Schedule</h2>
+            <h2 className="text-2xl font-headline font-extrabold text-on-surface">
+              {initialSchedule ? 'Edit Schedule' : 'Create Schedule'}
+            </h2>
             <p className="text-on-surface-variant text-sm mt-1">Add a new status change for a campus resource.</p>
           </div>
           <button type="button" className="p-2 hover:bg-surface-container rounded-full transition-all" onClick={close}>
@@ -153,7 +155,7 @@ export default function CreateScheduleDrawer({ open, onClose, onCreated }) {
             className="flex-[2] px-6 py-3 bg-primary text-white font-headline font-bold text-sm rounded-xl shadow-lg hover:bg-primary-container hover:shadow-xl hover:scale-[1.01] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
           >
             <Icon name={submitting ? 'hourglass_top' : 'verified'} className="text-sm" />
-            {submitting ? 'Creating...' : 'Create Schedule'}
+            {submitting ? (initialSchedule ? 'Updating...' : 'Creating...') : initialSchedule ? 'Update Schedule' : 'Create Schedule'}
           </button>
         </footer>
       </aside>

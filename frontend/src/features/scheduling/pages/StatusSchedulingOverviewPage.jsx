@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { getErrorMessage } from '../../../services/httpClient.js';
-import { getSchedulingOverviewBundle } from '../api/schedulingService.js';
+import { deleteGlobalSchedule, getSchedulingOverviewBundle } from '../api/schedulingService.js';
 import SchedulingOverviewHeader from '../components/SchedulingOverviewHeader.jsx';
 import SchedulingSummaryCards from '../components/SchedulingSummaryCards.jsx';
 import SchedulingFiltersBar from '../components/SchedulingFiltersBar.jsx';
@@ -12,6 +12,7 @@ import PriorityAlertsCard from '../components/PriorityAlertsCard.jsx';
 import QuickActionsCard from '../components/QuickActionsCard.jsx';
 import RecentlyUpdatedSchedulesSection from '../components/RecentlyUpdatedSchedulesSection.jsx';
 import CreateScheduleDrawer from '../components/CreateScheduleDrawer.jsx';
+import { confirmDeleteAlert } from '../../../utils/sweetAlerts.js';
 
 const defaultFilters = {
   search: '',
@@ -35,6 +36,8 @@ export default function StatusSchedulingOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState(null);
+  const [deletingScheduleId, setDeletingScheduleId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -75,6 +78,32 @@ export default function StatusSchedulingOverviewPage() {
     });
   }, []);
 
+  const handleEditSchedule = useCallback((row) => {
+    setEditingSchedule(row);
+    setIsCreateDrawerOpen(true);
+  }, []);
+
+  const handleDeleteSchedule = useCallback(
+    async (row) => {
+      const confirmed = await confirmDeleteAlert({
+        title: 'Delete schedule?',
+        text: `This will remove the schedule for ${row.resourceName}.`,
+      });
+      if (!confirmed) return;
+      setDeletingScheduleId(row.scheduleId);
+      try {
+        await deleteGlobalSchedule({ resourceId: row.resourceId, scheduleId: row.scheduleId });
+        toast.success('Schedule deleted successfully');
+        await load();
+      } catch (e) {
+        toast.error(getErrorMessage(e));
+      } finally {
+        setDeletingScheduleId(null);
+      }
+    },
+    [load]
+  );
+
   return (
     <div className="p-8 space-y-8">
       <SchedulingOverviewHeader
@@ -113,7 +142,13 @@ export default function StatusSchedulingOverviewPage() {
 
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-12 lg:col-span-8 space-y-8">
-          <UpcomingStatusChangesTable rows={data.items} loading={loading} />
+          <UpcomingStatusChangesTable
+            rows={data.items}
+            loading={loading}
+            onEdit={handleEditSchedule}
+            onDelete={handleDeleteSchedule}
+            deletingScheduleId={deletingScheduleId}
+          />
           <RecentlyUpdatedSchedulesSection items={data.recentUpdates || []} loading={loading} />
         </div>
 
@@ -126,8 +161,15 @@ export default function StatusSchedulingOverviewPage() {
 
       <CreateScheduleDrawer
         open={isCreateDrawerOpen}
-        onClose={() => setIsCreateDrawerOpen(false)}
-        onCreated={load}
+        onClose={() => {
+          setIsCreateDrawerOpen(false);
+          setEditingSchedule(null);
+        }}
+        onCreated={async () => {
+          await load();
+          setEditingSchedule(null);
+        }}
+        initialSchedule={editingSchedule}
       />
     </div>
   );
