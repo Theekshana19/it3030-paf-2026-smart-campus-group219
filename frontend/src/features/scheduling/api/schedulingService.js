@@ -10,6 +10,13 @@ function toMinutes(timeValue) {
   return (hh || 0) * 60 + (mm || 0);
 }
 
+function toBackendTime(timeValue) {
+  const value = String(timeValue || '').trim();
+  if (!value) return '';
+  if (value.length === 5) return `${value}:00`;
+  return value.slice(0, 8);
+}
+
 function toTimeLabel(timeValue) {
   const value = String(timeValue || '').slice(0, 5);
   if (!value.includes(':')) return '--:--';
@@ -247,4 +254,63 @@ export async function getPriorityAlerts(filters = {}) {
 export async function getRecentScheduleUpdates(filters = {}) {
   const data = await loadOverview(filters);
   return data.recentUpdates;
+}
+
+export async function listDrawerResources(query = '') {
+  const { items = [] } = await listResources({
+    page: 0,
+    size: 100,
+    sortBy: 'resourceName',
+    sortDir: 'asc',
+    search: query || undefined,
+  });
+  return items.map((resource) => ({
+    resourceId: resource.resourceId,
+    resourceName: resource.resourceName,
+    resourceCode: resource.resourceCode,
+    building: resource.building || '',
+    floor: resource.floor || '',
+    roomOrAreaIdentifier: resource.roomOrAreaIdentifier || '',
+    status: resource.status || 'ACTIVE',
+    resourceType: resource.resourceType,
+  }));
+}
+
+export async function checkScheduleOverlap({ resourceId, scheduleDate, startTime, endTime, ignoreScheduleId }) {
+  if (!resourceId || !scheduleDate || !startTime || !endTime) return { hasConflict: false, conflictWith: null };
+  const schedules = await listResourceStatusSchedules(resourceId);
+  const start = toMinutes(startTime);
+  const end = toMinutes(endTime);
+  const overlap = (Array.isArray(schedules) ? schedules : []).find((schedule) => {
+    if (!schedule?.isActive) return false;
+    if (ignoreScheduleId && Number(schedule.scheduleId) === Number(ignoreScheduleId)) return false;
+    if (String(schedule.scheduleDate) !== String(scheduleDate)) return false;
+    const existingStart = toMinutes(schedule.startTime);
+    const existingEnd = toMinutes(schedule.endTime);
+    return start < existingEnd && end > existingStart;
+  });
+  if (!overlap) return { hasConflict: false, conflictWith: null };
+  return {
+    hasConflict: true,
+    conflictWith: {
+      scheduleId: overlap.scheduleId,
+      reasonNote: overlap.reasonNote || '',
+      startTime: String(overlap.startTime || '').slice(0, 5),
+      endTime: String(overlap.endTime || '').slice(0, 5),
+    },
+  };
+}
+
+export async function createGlobalSchedule(payload) {
+  const { resourceId, scheduleDate, startTime, endTime, scheduledStatus, reasonNote, isActive = true } = payload;
+  if (!resourceId) throw new Error('Resource is required');
+  const { data } = await httpClient.post(`/api/resources/${resourceId}/status-schedules`, {
+    scheduleDate,
+    startTime: toBackendTime(startTime),
+    endTime: toBackendTime(endTime),
+    scheduledStatus,
+    reasonNote: reasonNote ? String(reasonNote).trim() : '',
+    isActive,
+  });
+  return data;
 }

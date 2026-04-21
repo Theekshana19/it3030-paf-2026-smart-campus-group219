@@ -11,6 +11,7 @@ import TodayTimelineOverviewCard from '../components/TodayTimelineOverviewCard.j
 import PriorityAlertsCard from '../components/PriorityAlertsCard.jsx';
 import QuickActionsCard from '../components/QuickActionsCard.jsx';
 import RecentlyUpdatedSchedulesSection from '../components/RecentlyUpdatedSchedulesSection.jsx';
+import CreateScheduleDrawer from '../components/CreateScheduleDrawer.jsx';
 
 const defaultFilters = {
   search: '',
@@ -33,6 +34,7 @@ export default function StatusSchedulingOverviewPage() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -76,7 +78,7 @@ export default function StatusSchedulingOverviewPage() {
   return (
     <div className="p-8 space-y-8">
       <SchedulingOverviewHeader
-        onCreate={() => toast.message('Create Schedule flow can be connected to your modal/form next.')}
+        onCreate={() => setIsCreateDrawerOpen(true)}
         onExport={() => toast.message('Export generation can be connected to CSV endpoint.')}
       />
 
@@ -121,6 +123,12 @@ export default function StatusSchedulingOverviewPage() {
           <QuickActionsCard />
         </div>
       </div>
+
+      <CreateScheduleDrawer
+        open={isCreateDrawerOpen}
+        onClose={() => setIsCreateDrawerOpen(false)}
+        onCreated={load}
+      />
     </div>
   );
 }
