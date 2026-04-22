@@ -111,3 +111,26 @@ npm run dev
 ```
 
 Then open the URL Vite prints (typically `http://localhost:5173`). The **Add New Resource** screen is at `/resources/new`.
+
+
+Step 1 — Start only the database (in any terminal):
+
+
+docker-compose up sqlserver db-init
+Wait until you see Database ready!
+
+Step 2 — Run backend (new terminal, inside backend folder):
+
+
+cd backend
+mvnw.cmd spring-boot:run
+Wait until you see Started SmartCampusApplication
+
+Step 3 — Run frontend (new terminal, inside frontend folder):
+
+
+cd frontend
+npm run dev
+Open http://localhost:5173
+
+Now every time you save a .java file the backend restarts automatically, and every .jsx/.css save reflects instantly in the browser — no Docker rebuild needed.

@@ -86,14 +86,12 @@ export default function Sidebar() {
           label="Bookings"
           isCustomActive={bookingsNavActive}
         />
-        <NavItem to="/bookings/new" icon="edit_calendar" label="New Booking" />
         <NavItem
           to="/tickets"
           icon="confirmation_number"
           label="Incident Tickets"
           isCustomActive={ticketsNavActive}
         />
-        <NavItem to="/tickets/new" icon="report_problem" label="Report Issue" />
         <NavItem
           to="/status-scheduling"
           icon="calendar_today"
