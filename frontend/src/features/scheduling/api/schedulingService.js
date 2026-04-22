@@ -10,11 +10,47 @@ function toMinutes(timeValue) {
   return (hh || 0) * 60 + (mm || 0);
 }
 
-function toBackendTime(timeValue) {
+export function toBackendTime(timeValue) {
   const value = String(timeValue || '').trim();
   if (!value) return '';
   if (value.length === 5) return `${value}:00`;
   return value.slice(0, 8);
+}
+
+/** @param {string} scheduleDate @param {string} endTime HH:mm */
+function scheduleEndAsDate(scheduleDate, endTime) {
+  const d = String(scheduleDate || '').slice(0, 10);
+  const t = toBackendTime(String(endTime || '').slice(0, 5)) || '23:59:59';
+  return new Date(`${d}T${t}`);
+}
+
+/**
+ * Half-open [start, end): effective OUT_OF_SERVICE only while now is inside the window.
+ * Matches backend SmartAvailabilityService / overview logic.
+ */
+function effectiveOverviewTargetStatus(schedule) {
+  const raw = String(schedule.scheduledStatus || '').toUpperCase();
+  if (schedule.isActive === false) return raw;
+  if (raw !== 'OUT_OF_SERVICE') return raw;
+  const d = String(schedule.scheduleDate || '').slice(0, 10);
+  if (!d) return raw;
+  const startT = toBackendTime(String(schedule.startTime || '').slice(0, 5)) || '00:00:00';
+  const endT = toBackendTime(String(schedule.endTime || '').slice(0, 5)) || '23:59:59';
+  const startDt = new Date(`${d}T${startT}`);
+  const endDt = new Date(`${d}T${endT}`);
+  const now = Date.now();
+  if (now >= startDt.getTime() && now < endDt.getTime()) return 'OUT_OF_SERVICE';
+  if (now >= endDt.getTime()) return 'ACTIVE';
+  return 'OUT_OF_SERVICE';
+}
+
+/** Default overview: hide past calendar days and today's windows that have ended. */
+function isFallbackOverviewRowVisible(row) {
+  const d = String(row.scheduleDate || '').slice(0, 10);
+  if (!d) return true;
+  const today = new Date().toISOString().slice(0, 10);
+  if (d < today) return false;
+  return Date.now() < scheduleEndAsDate(row.scheduleDate, row.endTime).getTime();
 }
 
 function toTimeLabel(timeValue) {
@@ -100,7 +136,7 @@ function toScheduleRow(resource, schedule) {
     startTime: String(schedule.startTime || '').slice(0, 5),
     endTime: String(schedule.endTime || '').slice(0, 5),
     timeRangeLabel: `${toTimeLabel(schedule.startTime)} - ${toTimeLabel(schedule.endTime)}`,
-    targetStatus: String(schedule.scheduledStatus || '').toUpperCase(),
+    targetStatus: effectiveOverviewTargetStatus(schedule),
     reasonNote: schedule.reasonNote || '',
     isActive: schedule.isActive !== false,
     updatedAt: schedule.updatedAt || schedule.createdAt || null,
@@ -141,6 +177,7 @@ function timelineFromRows(rows) {
   const today = new Date().toISOString().slice(0, 10);
   return rows
     .filter((r) => r.scheduleDate === today)
+    .filter((r) => Date.now() < scheduleEndAsDate(r.scheduleDate, r.endTime).getTime())
     .sort((a, b) => toMinutes(a.startTime) - toMinutes(b.startTime))
     .slice(0, 6)
     .map((r) => ({
@@ -208,7 +245,11 @@ async function loadOverview(filters = {}) {
     const endpointUnavailable = status === 404 || message.includes('no static resource') || message.includes('not found');
     if (!endpointUnavailable) throw error;
 
-    const allRows = await loadFallbackOverviewRows();
+    let allRows = await loadFallbackOverviewRows();
+    const hasDateRange = !!(filters.fromDate || filters.toDate);
+    if (!hasDateRange) {
+      allRows = allRows.filter(isFallbackOverviewRowVisible);
+    }
     const filtered = applyFilters(allRows, filters);
     return {
       items: filtered,
@@ -332,4 +373,61 @@ export async function updateGlobalSchedule(payload) {
 export async function deleteGlobalSchedule({ resourceId, scheduleId }) {
   if (!resourceId || !scheduleId) throw new Error('Resource and schedule are required');
   await httpClient.delete(`/api/resources/${resourceId}/status-schedules/${scheduleId}`);
+}
+
+const STATUS_SCHEDULES_BATCH_BASE = '/api/status-schedules';
+
+/**
+ * Batch conflict check (read-only). Returns noConflictResourceIds and conflicts[].
+ * @param {{ resourceIds: number[]; scheduleDate: string; startTime: string; endTime: string }} payload
+ */
+export async function precheckSchedules(payload) {
+  const { data } = await httpClient.post(`${STATUS_SCHEDULES_BATCH_BASE}/precheck`, {
+    resourceIds: payload.resourceIds,
+    scheduleDate: payload.scheduleDate,
+    startTime: toBackendTime(payload.startTime),
+    endTime: toBackendTime(payload.endTime),
+  });
+  return data;
+}
+
+/**
+ * Creates one schedule per resource for a shared window. Partial success: 200 OK with created/skipped.
+ * @param {{ resourceIds: number[]; scheduleDate: string; startTime: string; endTime: string; scheduledStatus: string; reasonNote?: string; notifyAffectedUsers?: boolean }} payload
+ */
+export async function bulkCreateSchedules(payload) {
+  const { data } = await httpClient.post(`${STATUS_SCHEDULES_BATCH_BASE}/bulk`, {
+    resourceIds: payload.resourceIds,
+    scheduleDate: payload.scheduleDate,
+    startTime: toBackendTime(payload.startTime),
+    endTime: toBackendTime(payload.endTime),
+    scheduledStatus: payload.scheduledStatus,
+    reasonNote: payload.reasonNote != null ? String(payload.reasonNote).trim() : '',
+    notifyAffectedUsers: payload.notifyAffectedUsers ?? false,
+  });
+  return data;
+}
+
+/**
+ * Emergency schedules (immediate or fixed window). notifyAffectedUsers / highPriority accepted; notifications are no-op until Module D.
+ * @param {{ resourceIds: number[]; effectiveMode: 'IMMEDIATE' | 'SCHEDULED'; scheduledStatus: string; reasonNote: string; scheduleDate?: string; startTime?: string; endTime?: string; notifyAffectedUsers?: boolean; highPriority?: boolean }} payload
+ */
+export async function emergencyOverrideSchedules(payload) {
+  const body = {
+    resourceIds: payload.resourceIds,
+    effectiveMode: payload.effectiveMode,
+    scheduledStatus: payload.scheduledStatus,
+    reasonNote: String(payload.reasonNote || '').trim(),
+    notifyAffectedUsers: payload.notifyAffectedUsers ?? false,
+    highPriority: payload.highPriority ?? false,
+  };
+  if (payload.effectiveMode === 'SCHEDULED') {
+    body.scheduleDate = payload.scheduleDate;
+    body.startTime = toBackendTime(payload.startTime);
+    body.endTime = toBackendTime(payload.endTime);
+  } else if (payload.endTime) {
+    body.endTime = toBackendTime(payload.endTime);
+  }
+  const { data } = await httpClient.post(`${STATUS_SCHEDULES_BATCH_BASE}/emergency-override`, body);
+  return data;
 }

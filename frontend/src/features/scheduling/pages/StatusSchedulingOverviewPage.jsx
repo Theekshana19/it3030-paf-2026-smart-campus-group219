@@ -12,6 +12,8 @@ import PriorityAlertsCard from '../components/PriorityAlertsCard.jsx';
 import QuickActionsCard from '../components/QuickActionsCard.jsx';
 import RecentlyUpdatedSchedulesSection from '../components/RecentlyUpdatedSchedulesSection.jsx';
 import CreateScheduleDrawer from '../components/CreateScheduleDrawer.jsx';
+import BulkStatusUpdateDrawer from '../components/BulkStatusUpdateDrawer.jsx';
+import EmergencyOverrideDrawer from '../components/EmergencyOverrideDrawer.jsx';
 import { confirmDeleteAlert } from '../../../utils/sweetAlerts.js';
 import { exportScheduleListAsCsv } from '../utils/exportScheduleListCsv.js';
 
@@ -37,6 +39,8 @@ export default function StatusSchedulingOverviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false);
+  const [isBulkDrawerOpen, setIsBulkDrawerOpen] = useState(false);
+  const [isEmergencyDrawerOpen, setIsEmergencyDrawerOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState(null);
   const [deletingScheduleId, setDeletingScheduleId] = useState(null);
 
@@ -55,9 +59,27 @@ export default function StatusSchedulingOverviewPage() {
     }
   }, [filters]);
 
+  const loadSilent = useCallback(async () => {
+    try {
+      const next = await getSchedulingOverviewBundle(filters);
+      setData(next);
+    } catch {
+      /* keep last good snapshot; avoid toasts on background poll */
+    }
+  }, [filters]);
+
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    const anyDrawerOpen = isCreateDrawerOpen || isBulkDrawerOpen || isEmergencyDrawerOpen;
+    if (anyDrawerOpen) return undefined;
+    const id = setInterval(() => {
+      loadSilent();
+    }, 30000);
+    return () => clearInterval(id);
+  }, [loadSilent, isCreateDrawerOpen, isBulkDrawerOpen, isEmergencyDrawerOpen]);
 
   const filterOptions = useMemo(() => {
     const resourceTypes = [...new Set(data.items.map((r) => r.resourceType).filter(Boolean))];
@@ -173,7 +195,10 @@ export default function StatusSchedulingOverviewPage() {
         <div className="col-span-12 lg:col-span-4 space-y-8">
           <TodayTimelineOverviewCard items={data.timeline || []} loading={loading} />
           <PriorityAlertsCard alerts={data.alerts || []} loading={loading} />
-          <QuickActionsCard />
+          <QuickActionsCard
+            onBulkStatusUpdate={() => setIsBulkDrawerOpen(true)}
+            onEmergencyOverride={() => setIsEmergencyDrawerOpen(true)}
+          />
         </div>
       </div>
 
@@ -188,6 +213,17 @@ export default function StatusSchedulingOverviewPage() {
           setEditingSchedule(null);
         }}
         initialSchedule={editingSchedule}
+      />
+
+      <BulkStatusUpdateDrawer
+        open={isBulkDrawerOpen}
+        onClose={() => setIsBulkDrawerOpen(false)}
+        onSuccess={load}
+      />
+      <EmergencyOverrideDrawer
+        open={isEmergencyDrawerOpen}
+        onClose={() => setIsEmergencyDrawerOpen(false)}
+        onSuccess={load}
       />
     </div>
   );

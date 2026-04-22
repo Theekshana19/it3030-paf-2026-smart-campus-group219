@@ -5,7 +5,9 @@ import InfoRow from './InfoRow.jsx';
  * @param {{ resource?: Record<string, any> | null }} props
  */
 export default function ResourceBasicInfoCard({ resource }) {
-  const safety = resource?.status === 'OUT_OF_SERVICE' ? 'Restricted' : 'BSL-2';
+  const smartOos = String(resource?.smartAvailabilityStatus || '').toUpperCase() === 'OUT_OF_SERVICE';
+  const storedOos = resource?.status === 'OUT_OF_SERVICE';
+  const safety = smartOos || storedOos ? 'Restricted' : 'BSL-2';
   return (
     <section className="bg-surface-container-lowest p-6 rounded-xl shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)] border border-outline-variant/10">
       <div className="flex items-center justify-between mb-4">

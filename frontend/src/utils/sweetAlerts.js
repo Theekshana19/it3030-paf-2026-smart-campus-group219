@@ -10,6 +10,27 @@ const baseClasses = {
 /**
  * @param {{title: string; text: string; confirmText?: string}} args
  */
+export async function confirmEmergencyOverrideAlert({
+  title = 'Confirm emergency override?',
+  text = 'This will publish urgent status schedules to the selected resources. Only continue if the incident is verified.',
+  confirmText = 'Yes, apply override',
+}) {
+  const result = await Swal.fire({
+    icon: 'error',
+    title,
+    text,
+    showCancelButton: true,
+    confirmButtonText: confirmText,
+    cancelButtonText: 'Cancel',
+    reverseButtons: true,
+    confirmButtonColor: '#B3261E',
+    cancelButtonColor: '#A0A4AB',
+    focusCancel: true,
+    customClass: baseClasses,
+  });
+  return result.isConfirmed;
+}
+
 export async function confirmDeleteAlert({ title, text, confirmText = 'Delete' }) {
   const result = await Swal.fire({
     icon: 'warning',

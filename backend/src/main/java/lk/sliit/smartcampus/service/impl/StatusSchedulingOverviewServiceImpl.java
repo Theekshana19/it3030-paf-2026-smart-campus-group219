@@ -51,10 +51,17 @@ public class StatusSchedulingOverviewServiceImpl implements StatusSchedulingOver
         repository.findForGlobalOverview(search, resourceType, building, status, fromDate, toDate);
 
     Map<Long, Boolean> conflictMap = buildConflictMap(schedules);
-    List<SchedulingOverviewItemResponse> items = schedules.stream().map(s -> toOverviewItem(s, conflictMap)).toList();
+    LocalDateTime now = LocalDateTime.now();
+    boolean defaultDateRange = fromDate == null && toDate == null;
+    List<ResourceStatusSchedule> displaySchedules =
+        defaultDateRange
+            ? schedules.stream().filter(s -> isStillVisibleOnOverview(s, now)).toList()
+            : schedules;
+    List<SchedulingOverviewItemResponse> items =
+        displaySchedules.stream().map(s -> toOverviewItem(s, conflictMap, now)).toList();
 
     SchedulingOverviewMetricsResponse metrics = toMetrics(items);
-    List<SchedulingTimelineItemResponse> timeline = toTimeline(items);
+    List<SchedulingTimelineItemResponse> timeline = toTimeline(items, now);
     List<SchedulingPriorityAlertResponse> alerts = toAlerts(items);
     List<SchedulingRecentUpdateResponse> recentUpdates = toRecentUpdates(items);
 
@@ -67,8 +74,49 @@ public class StatusSchedulingOverviewServiceImpl implements StatusSchedulingOver
         .build();
   }
 
+  /**
+   * Drops schedule rows that are entirely in the past (before today, or today's window has ended).
+   * Keeps future calendar dates and today's not-yet-ended windows.
+   */
+  private static boolean isStillVisibleOnOverview(ResourceStatusSchedule s, LocalDateTime now) {
+    if (s.getScheduleDate() == null) {
+      return true;
+    }
+    if (s.getScheduleDate().isBefore(now.toLocalDate())) {
+      return false;
+    }
+    LocalDateTime windowEnd = LocalDateTime.of(s.getScheduleDate(), s.getEndTime());
+    return now.isBefore(windowEnd);
+  }
+
+  /**
+   * Half-open {@code [start, end)}. For OUT_OF_SERVICE, show ACTIVE once the window has ended (operational
+   * state); future and in-window rows keep OUT_OF_SERVICE.
+   */
+  private static String effectiveTargetStatus(ResourceStatusSchedule schedule, LocalDateTime now) {
+    if (!Boolean.TRUE.equals(schedule.getIsActive())) {
+      return schedule.getScheduledStatus().name();
+    }
+    if (schedule.getScheduledStatus() != ScheduledStatus.OUT_OF_SERVICE) {
+      return schedule.getScheduledStatus().name();
+    }
+    LocalDate d = schedule.getScheduleDate();
+    if (d == null || schedule.getStartTime() == null || schedule.getEndTime() == null) {
+      return schedule.getScheduledStatus().name();
+    }
+    LocalDateTime startDt = LocalDateTime.of(d, schedule.getStartTime());
+    LocalDateTime endDt = LocalDateTime.of(d, schedule.getEndTime());
+    if (!now.isBefore(startDt) && now.isBefore(endDt)) {
+      return ScheduledStatus.OUT_OF_SERVICE.name();
+    }
+    if (!now.isBefore(endDt)) {
+      return ScheduledStatus.ACTIVE.name();
+    }
+    return ScheduledStatus.OUT_OF_SERVICE.name();
+  }
+
   private SchedulingOverviewItemResponse toOverviewItem(
-      ResourceStatusSchedule schedule, Map<Long, Boolean> conflictMap) {
+      ResourceStatusSchedule schedule, Map<Long, Boolean> conflictMap, LocalDateTime now) {
     Resource resource = schedule.getResource();
     String start = schedule.getStartTime().format(TIME_ONLY);
     String end = schedule.getEndTime().format(TIME_ONLY);
@@ -94,7 +142,7 @@ public class StatusSchedulingOverviewServiceImpl implements StatusSchedulingOver
         .endTime(end)
         .timeRangeLabel(
             schedule.getStartTime().format(TIME_LABEL) + " - " + schedule.getEndTime().format(TIME_LABEL))
-        .targetStatus(schedule.getScheduledStatus().name())
+        .targetStatus(effectiveTargetStatus(schedule, now))
         .reasonNote(nullable(schedule.getReasonNote()))
         .isActive(Boolean.TRUE.equals(schedule.getIsActive()))
         .hasConflict(Boolean.TRUE.equals(conflictMap.get(schedule.getScheduleId())))
@@ -121,10 +169,17 @@ public class StatusSchedulingOverviewServiceImpl implements StatusSchedulingOver
         .build();
   }
 
-  private List<SchedulingTimelineItemResponse> toTimeline(List<SchedulingOverviewItemResponse> items) {
+  private List<SchedulingTimelineItemResponse> toTimeline(
+      List<SchedulingOverviewItemResponse> items, LocalDateTime now) {
     LocalDate today = LocalDate.now();
     return items.stream()
         .filter(i -> today.equals(i.getScheduleDate()))
+        .filter(
+            i -> {
+              LocalDateTime endDt =
+                  LocalDateTime.of(i.getScheduleDate(), LocalTime.parse(i.getEndTime()));
+              return now.isBefore(endDt);
+            })
         .sorted(Comparator.comparing(SchedulingOverviewItemResponse::getStartTime))
         .limit(6)
         .map(

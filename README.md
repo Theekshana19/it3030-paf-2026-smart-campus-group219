@@ -1,5 +1,5 @@
 # it3030-paf-2026-smart-campus-group219
-
+##$env:DB_USERNAME="sa"; $env:DB_PASSWORD="tstc123"; .\mvnw.cmd spring-boot:run
 ## Backend (Spring Boot - MS SQL Server)
 
 ### Prerequisites
@@ -65,12 +65,24 @@ Resource-tag mapping:
 - `POST /api/resources/{resourceId}/tags/{tagId}`
 - `DELETE /api/resources/{resourceId}/tags/{tagId}`
 
+**Operational “now” vs stored status:** `GET /api/resources` and `GET /api/resources/{id}` return `status` from the database. `smartAvailabilityStatus` reflects **current** availability: a maintenance schedule only counts as out-of-service while **server local time** is inside that row’s window `[startTime, endTime)` on the schedule’s date (half-open interval, same as overlap checks). After `endTime`, availability returns to `AVAILABLE_NOW` unless the resource’s stored `status` is `OUT_OF_SERVICE`.
+
 Resource status schedules:
 - `POST /api/resources/{resourceId}/status-schedules`
 - `GET /api/resources/{resourceId}/status-schedules`
 - `GET /api/resources/{resourceId}/status-schedules/{scheduleId}`
 - `PUT /api/resources/{resourceId}/status-schedules/{scheduleId}`
 - `DELETE /api/resources/{resourceId}/status-schedules/{scheduleId}`
+
+Global status schedule batch (Status Scheduling overview — bulk / emergency quick actions) lives on the same controller as `GET /api/status-schedules/overview` (`StatusSchedulingOverviewController`). These return **200 OK** with a structured body for per-resource outcomes (partial success). Whole-request validation errors still return **400 Bad Request** via the global exception handler. Unknown paths under `/api` return **404** (not 500).
+
+The overview list (default filters) hides schedule rows that are **before today** or whose **end time has passed today**; `targetStatus` uses the same half-open window rule as resource `smartAvailabilityStatus` when date filters are applied and rows remain visible.
+
+- `POST /api/status-schedules/precheck` — classify overlaps / missing resources for a proposed window (no DB writes).
+- `POST /api/status-schedules/bulk` — create one schedule per resource for a shared window; response includes `created` and `skipped`.
+- `POST /api/status-schedules/emergency-override` — urgent schedules (`effectiveMode`: `IMMEDIATE` or `SCHEDULED`); same outcome shape as bulk.
+
+`notifyAffectedUsers` on bulk/emergency requests is accepted for forward compatibility but is currently a **no-op** until the notifications module exists. For emergencies, `highPriority: true` prefixes `reason_note` with `[EMERGENCY] ` when not already present (audit/search convention).
 
 ### API smoke test guide
 - Quick PowerShell checklist: `backend/docs/resource-api-smoke-test.md`

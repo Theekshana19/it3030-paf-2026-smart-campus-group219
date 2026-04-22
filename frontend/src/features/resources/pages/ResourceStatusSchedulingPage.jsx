@@ -310,7 +310,11 @@ export default function ResourceStatusSchedulingPage() {
         <ResourceScheduleHeaderCard
           resourceName={loading ? 'Loading resource...' : resource?.resourceName}
           resourceType={resource?.resourceType}
-          currentStatus={resource?.status}
+          currentStatus={
+            String(resource?.smartAvailabilityStatus || '').toUpperCase() === 'OUT_OF_SERVICE'
+              ? 'OUT_OF_SERVICE'
+              : 'ACTIVE'
+          }
         />
       </div>
 
