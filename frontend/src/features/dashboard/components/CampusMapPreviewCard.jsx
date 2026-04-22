@@ -1,16 +1,32 @@
 import Icon from '../../../components/common/Icon.jsx';
 
-const MAP_IMAGE =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuA4Kaz8nfkKxiJX7SftdM1L4W0XX-05ZsaFVt0hwWNqC_iR4oPQt5i6xXLy18WAnHspPTZ9kkoWePs-wKXXOL1QNyJUtZMzspRogW7er8deLOsrnoQq7_EopJrgHqW_b1mCmSxs8frB0uISd6EbzQruIoKCFU5ZlbAIFvG28_QgVKcoUmMbtm_ZK7WSBEn_S5yGI7Le0eQa9yGingV2VMw3E5T0rHM4io5tClPc9fNarLeR4tYDgCo1Ug50ggEz2i_hYDOjOMmT-GXH';
+const EMBED_MAP_URL =
+  'https://www.google.com/maps?q=SLIIT%20Malabe%20Campus%2C%20Sri%20Lanka&z=16&output=embed';
+const GOOGLE_MAPS_URL =
+  'https://www.google.com/maps/search/?api=1&query=SLIIT+Malabe+Campus%2C+Sri+Lanka';
 
 export default function CampusMapPreviewCard({ onExplore }) {
+  const handleExplore = () => {
+    if (typeof onExplore === 'function') {
+      onExplore();
+      return;
+    }
+    window.open(GOOGLE_MAPS_URL, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <section className="rounded-xl overflow-hidden relative h-48 shadow-[0_20px_30px_-8px_rgba(23,28,31,0.25)]">
-      <img src={MAP_IMAGE} alt="Campus map preview" className="w-full h-full object-cover" />
+      <iframe
+        title="SLIIT Malabe campus map preview"
+        src={EMBED_MAP_URL}
+        className="absolute inset-0 w-full h-full border-0"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
       <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
         <button
           type="button"
-          onClick={onExplore}
+          onClick={handleExplore}
           className="bg-white text-on-surface px-4 py-2 rounded-full text-xs font-bold shadow-xl flex items-center gap-2"
         >
           <Icon name="map" className="text-sm" />

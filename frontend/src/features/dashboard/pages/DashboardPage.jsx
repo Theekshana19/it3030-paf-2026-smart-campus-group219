@@ -73,7 +73,7 @@ export default function DashboardPage() {
             onManageTags={() => navigate('/tag-management')}
             onViewSchedule={() => navigate('/status-scheduling')}
           />
-          <CampusMapPreviewCard onExplore={() => navigate('/resources')} />
+          <CampusMapPreviewCard />
         </div>
       </section>
 
