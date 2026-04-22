@@ -7,6 +7,7 @@ import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceSt
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
 import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
 import TagManagementPage from '../features/tags/pages/TagManagementPage.jsx';
+import DashboardPage from '../features/dashboard/pages/DashboardPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -24,7 +25,8 @@ export const router = createBrowserRouter([
     path: '/',
     element: <DashboardLayout />,
     children: [
-      { index: true, element: <PlaceholderPage title="Dashboard" />, handle: { crumb: 'Dashboard' } },
+      { index: true, element: <Navigate to="/dashboard" replace />, handle: { crumb: 'Dashboard' } },
+      { path: 'dashboard', element: <DashboardPage />, handle: { crumb: 'Dashboard' } },
       {
         path: 'resources',
         element: <ResourceCataloguePage />,

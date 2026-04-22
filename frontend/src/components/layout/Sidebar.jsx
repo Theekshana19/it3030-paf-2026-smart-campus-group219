@@ -45,6 +45,10 @@ function tagManagementNavActive({ pathname }) {
   return pathname === '/tag-management' || pathname === '/tags';
 }
 
+function dashboardNavActive({ pathname }) {
+  return pathname === '/' || pathname === '/dashboard';
+}
+
 export default function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-[#545f73] dark:bg-slate-900 flex flex-col py-7 shadow-2xl z-50">
@@ -58,7 +62,7 @@ export default function Sidebar() {
         </div>
       </div>
       <nav className="flex-1 space-y-1">
-        <NavItem to="/" icon="dashboard" label="Dashboard" end />
+        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" isCustomActive={dashboardNavActive} />
         <NavItem
           to="/resources"
           icon="inventory_2"
