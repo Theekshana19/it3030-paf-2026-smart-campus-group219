@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import lk.sliit.smartcampus.dto.response.DashboardOverviewResponse;
+import lk.sliit.smartcampus.dto.response.DashboardRecentChangesResponse;
 import lk.sliit.smartcampus.dto.response.DashboardResponse;
 import lk.sliit.smartcampus.dto.response.RecentChangeItemResponse;
 import lk.sliit.smartcampus.dto.response.ResourceDistributionItemResponse;
@@ -50,7 +51,7 @@ public class DashboardServiceImpl implements DashboardService {
     return DashboardResponse.builder()
         .overview(getOverview())
         .distribution(getResourceDistribution())
-        .recentChanges(getRecentChanges())
+        .recentChanges(getRecentChanges(0, RECENT_LIMIT).getItems())
         .build();
   }
 
@@ -109,6 +110,30 @@ public class DashboardServiceImpl implements DashboardService {
 
   @Override
   public List<RecentChangeItemResponse> getRecentChanges() {
+    return buildRecentFeed().stream().limit(RECENT_LIMIT).toList();
+  }
+
+  @Override
+  public DashboardRecentChangesResponse getRecentChanges(Integer page, Integer size) {
+    List<RecentChangeItemResponse> feed = buildRecentFeed();
+    int safePage = Math.max(0, page);
+    int safeSize = Math.max(1, size);
+    int totalItems = feed.size();
+    int totalPages = totalItems == 0 ? 0 : (int) Math.ceil((double) totalItems / safeSize);
+    int fromIndex = Math.min(safePage * safeSize, totalItems);
+    int toIndex = Math.min(fromIndex + safeSize, totalItems);
+    List<RecentChangeItemResponse> items = feed.subList(fromIndex, toIndex);
+
+    return DashboardRecentChangesResponse.builder()
+        .items(items)
+        .totalItems(totalItems)
+        .page(safePage)
+        .size(safeSize)
+        .totalPages(totalPages)
+        .build();
+  }
+
+  private List<RecentChangeItemResponse> buildRecentFeed() {
     List<RecentChangeItemResponse> feed = new ArrayList<>();
 
     List<Resource> recentUpdated =
@@ -161,9 +186,10 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     feed.sort(
-        Comparator.comparing(RecentChangeItemResponse::getOccurredAt, Comparator.nullsLast(Comparator.naturalOrder()))
+        Comparator.comparing(
+                RecentChangeItemResponse::getOccurredAt, Comparator.nullsLast(Comparator.naturalOrder()))
             .reversed());
-    return feed.stream().limit(RECENT_LIMIT).toList();
+    return feed;
   }
 
   private static String toLabel(ResourceType type) {

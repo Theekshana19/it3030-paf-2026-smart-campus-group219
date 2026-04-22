@@ -12,7 +12,20 @@ import useDashboardOverview from '../hooks/useDashboardOverview.js';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { overview, distribution, recentChanges, loading, error, retry } = useDashboardOverview();
+  const {
+    overview,
+    distribution,
+    recentChanges,
+    recentPage,
+    recentSize,
+    recentTotalPages,
+    recentTotalItems,
+    recentLoading,
+    loading,
+    error,
+    loadRecentChanges,
+    retry,
+  } = useDashboardOverview();
 
   useEffect(() => {
     retry();
@@ -43,7 +56,16 @@ export default function DashboardPage() {
       <section className="grid grid-cols-12 gap-8">
         <div className="col-span-12 xl:col-span-8 space-y-8">
           <ResourceDistributionSection distribution={distribution} loading={loading} />
-          <RecentChangesSection items={recentChanges} loading={loading} />
+          <RecentChangesSection
+            items={recentChanges}
+            loading={recentLoading}
+            page={recentPage}
+            size={recentSize}
+            totalPages={recentTotalPages}
+            totalItems={recentTotalItems}
+            onPrevPage={() => loadRecentChanges(Math.max(0, recentPage - 1))}
+            onNextPage={() => loadRecentChanges(recentPage + 1)}
+          />
         </div>
         <div className="col-span-12 xl:col-span-4 space-y-8">
           <DashboardQuickActions

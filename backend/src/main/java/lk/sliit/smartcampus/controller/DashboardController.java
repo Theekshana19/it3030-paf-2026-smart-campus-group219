@@ -2,12 +2,14 @@ package lk.sliit.smartcampus.controller;
 
 import java.util.List;
 import lk.sliit.smartcampus.dto.response.DashboardOverviewResponse;
+import lk.sliit.smartcampus.dto.response.DashboardRecentChangesResponse;
 import lk.sliit.smartcampus.dto.response.DashboardResponse;
 import lk.sliit.smartcampus.dto.response.RecentChangeItemResponse;
 import lk.sliit.smartcampus.dto.response.ResourceDistributionItemResponse;
 import lk.sliit.smartcampus.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +36,15 @@ public class DashboardController {
   }
 
   @GetMapping("/recent-changes")
-  public List<RecentChangeItemResponse> getRecentChanges() {
-    return dashboardService.getRecentChanges();
+  public DashboardRecentChangesResponse getRecentChanges(
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "5") Integer size) {
+    if (page < 0) {
+      throw new IllegalArgumentException("page must be greater than or equal to 0");
+    }
+    if (size < 1 || size > 20) {
+      throw new IllegalArgumentException("size must be between 1 and 20");
+    }
+    return dashboardService.getRecentChanges(page, size);
   }
 }

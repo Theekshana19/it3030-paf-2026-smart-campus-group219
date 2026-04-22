@@ -1,6 +1,19 @@
 import RecentChangeItem from './RecentChangeItem.jsx';
 
-export default function RecentChangesSection({ items, loading }) {
+export default function RecentChangesSection({
+  items,
+  loading,
+  page,
+  size,
+  totalPages,
+  totalItems,
+  onPrevPage,
+  onNextPage,
+}) {
+  const hasPages = totalPages > 0;
+  const from = hasPages ? page * size + 1 : 0;
+  const to = hasPages ? Math.min((page + 1) * size, totalItems) : 0;
+
   return (
     <section className="bg-surface-container-lowest rounded-xl p-8 shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)]">
       <div className="flex justify-between items-center mb-6">
@@ -26,6 +39,29 @@ export default function RecentChangesSection({ items, loading }) {
           No recent operational activity yet.
         </div>
       )}
+      <div className="mt-4 pt-4 border-t border-outline-variant/20 flex items-center justify-between">
+        <span className="text-xs text-on-surface-variant">
+          {hasPages ? `${from}-${to} of ${totalItems}` : '0 results'}
+        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onPrevPage}
+            disabled={loading || page <= 0}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            onClick={onNextPage}
+            disabled={loading || !hasPages || page >= totalPages - 1}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-low text-on-surface disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
