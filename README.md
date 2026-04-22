@@ -56,10 +56,15 @@ Resources:
 
 Resource tags:
 - `POST /api/resource-tags`
-- `GET /api/resource-tags`
+- `GET /api/resource-tags` — each item may include nullable `usageCount` (number of resource mappings for that tag).
 - `GET /api/resource-tags/{tagId}`
 - `PUT /api/resource-tags/{tagId}`
 - `DELETE /api/resource-tags/{tagId}`
+- `GET /api/resource-tags/overview` — dashboard aggregates: `mostUsedTags` (top tags with `usageCount`), `untaggedResourceCount`, `totalActiveTags`.
+- `POST /api/resource-tags/bulk-assign` — body `{ "resourceIds": [...], "tagIds": [...] }`; returns **200** with `mappingsCreated`, `duplicatesSkipped`, and optional `failed` entries (partial success). Duplicate `(resource, tag)` pairs are skipped, not errors.
+
+Untagged resources (for tag management / cleanup):
+- `GET /api/resources/untagged` — paged list of resources with no tag mappings. Query params align with the main resource list where applicable: `search`, `page`, `size`, `sortBy`, `sortDir` (same validation caps as `GET /api/resources`).
 
 Resource-tag mapping:
 - `POST /api/resources/{resourceId}/tags/{tagId}`
@@ -88,6 +93,10 @@ The overview list (default filters) hides schedule rows that are **before today*
 - Quick PowerShell checklist: `backend/docs/resource-api-smoke-test.md`
 - Includes negative tests for `400 Bad Request` validation checks.
 - Includes expected status code checklist for all resource-module endpoints.
+
+### Tag management UI (manual regression)
+- Open `/tag-management` (legacy `/tags` redirects there). Overview cards and tag grid load; create tag → appears in grid; bulk assign → mappings visible on resource details; delete tag removes it (mappings cascade server-side); untagged count matches `GET /api/resources/untagged` total.
+- Regression: **Add Resource** / **Edit Resource** tag pickers still work; **Resources Catalogue** tag filter still works (`tagsApi` re-exports tag service calls).
 
 ## Frontend (Vite + React)
 

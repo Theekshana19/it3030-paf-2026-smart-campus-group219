@@ -6,6 +6,7 @@ import ResourceDetailsPage from '../features/resources/pages/ResourceDetailsPage
 import ResourceStatusSchedulingPage from '../features/resources/pages/ResourceStatusSchedulingPage.jsx';
 import EditResourcePage from '../features/resources/pages/EditResourcePage.jsx';
 import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
+import TagManagementPage from '../features/tags/pages/TagManagementPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -60,9 +61,14 @@ export const router = createBrowserRouter([
         handle: { crumb: 'Status scheduling' },
       },
       {
+        path: 'tag-management',
+        element: <TagManagementPage />,
+        handle: { crumb: 'Campus Tag Manager' },
+      },
+      {
         path: 'tags',
-        element: <PlaceholderPage title="Tag management" />,
-        handle: { crumb: 'Tags' },
+        element: <Navigate to="/tag-management" replace />,
+        handle: { crumb: 'Campus Tag Manager' },
       },
       {
         path: 'settings',

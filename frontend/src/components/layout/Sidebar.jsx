@@ -41,6 +41,10 @@ function schedulingNavActive({ pathname }) {
   return pathname === '/status-scheduling' || pathname === '/scheduling' || pathname.endsWith('/schedules');
 }
 
+function tagManagementNavActive({ pathname }) {
+  return pathname === '/tag-management' || pathname === '/tags';
+}
+
 export default function Sidebar() {
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-[#545f73] dark:bg-slate-900 flex flex-col py-7 shadow-2xl z-50">
@@ -68,7 +72,12 @@ export default function Sidebar() {
           label="Status Scheduling"
           isCustomActive={schedulingNavActive}
         />
-        <NavItem to="/tags" icon="sell" label="Tag Management" />
+        <NavItem
+          to="/tag-management"
+          icon="sell"
+          label="Tag Management"
+          isCustomActive={tagManagementNavActive}
+        />
         <NavItem to="/settings" icon="settings" label="Settings" />
       </nav>
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">

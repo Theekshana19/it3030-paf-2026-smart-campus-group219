@@ -9,4 +9,6 @@ public interface ResourceTagRepository extends JpaRepository<ResourceTag, Long> 
   boolean existsByTagNameIgnoreCase(String tagName);
 
   Optional<ResourceTag> findByTagNameIgnoreCase(String tagName);
+
+  long countByIsActiveTrue();
 }

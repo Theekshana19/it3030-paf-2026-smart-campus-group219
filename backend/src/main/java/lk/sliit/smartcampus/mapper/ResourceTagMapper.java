@@ -33,6 +33,10 @@ public class ResourceTagMapper {
   }
 
   public ResourceTagResponse toResponse(ResourceTag entity) {
+    return toResponse(entity, null);
+  }
+
+  public ResourceTagResponse toResponse(ResourceTag entity, Integer usageCount) {
     return ResourceTagResponse.builder()
         .tagId(entity.getTagId())
         .tagName(entity.getTagName())
@@ -41,6 +45,7 @@ public class ResourceTagMapper {
         .isActive(entity.getIsActive())
         .createdAt(entity.getCreatedAt())
         .updatedAt(entity.getUpdatedAt())
+        .usageCount(usageCount)
         .build();
   }
 }

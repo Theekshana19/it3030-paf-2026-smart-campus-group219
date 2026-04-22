@@ -15,5 +15,8 @@ public class ResourceTagResponse {
   private Boolean isActive;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+
+  /** Number of resources mapped to this tag; null when not computed. */
+  private Integer usageCount;
 }
 
