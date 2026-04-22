@@ -34,7 +34,11 @@ public class GlobalExceptionHandler {
     return build(HttpStatus.NOT_FOUND, exception.getMessage(), request);
   }
 
-  @ExceptionHandler({DuplicateResourceCodeException.class, DuplicateTagMappingException.class})
+  @ExceptionHandler({
+    DuplicateResourceCodeException.class,
+    DuplicateTagMappingException.class,
+    ScheduleOverlapException.class
+  })
   public ResponseEntity<ApiErrorResponse> handleConflict(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.CONFLICT, exception.getMessage(), request);

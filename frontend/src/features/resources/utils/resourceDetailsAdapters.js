@@ -54,12 +54,7 @@ export function buildDetailsTimelineSegments(schedules) {
     .sort((a, b) => a.start - b.start);
 
   if (sorted.length === 0) {
-    return [
-      { start: '08:00', end: '11:00', type: 'AVAILABLE' },
-      { start: '11:00', end: '14:00', type: 'BOOKED', label: 'Booked' },
-      { start: '14:00', end: '15:00', type: 'BUFFER' },
-      { start: '15:00', end: '20:00', type: 'BOOKED', label: 'Booked' },
-    ];
+    return [];
   }
 
   const out = [];
@@ -82,17 +77,59 @@ export function buildDetailsTimelineSegments(schedules) {
   return out;
 }
 
+function formatRelativeTime(value) {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  const diffMs = Date.now() - d.getTime();
+  const mins = Math.max(1, Math.floor(diffMs / 60000));
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hour${hrs > 1 ? 's' : ''} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days > 1 ? 's' : ''} ago`;
+}
+
 /**
- * Isolated fallback until activity/audit endpoint is available.
+ * Builds recent activity from actual resource/schedule data only.
  * @param {Record<string, any>|null} resource
+ * @param {Array<Record<string, any>>} schedules
  */
-export function buildFallbackActivity(resource) {
-  const name = resource?.resourceName || 'Resource';
-  return [
-    { key: 'schedule', title: 'Schedule Modified', sub: 'Added Friday maintenance window', who: 'Admin Sarah W.', when: '2 hours ago', icon: 'edit_note', tone: 'primary' },
-    { key: 'booking', title: 'Booking Confirmed', sub: `${name} booking confirmed`, who: 'Prof. Aris T.', when: 'Yesterday, 4:15 PM', icon: 'check_circle', tone: 'tertiary' },
-    { key: 'access', title: 'Access Logged', sub: 'Smart lock entry - Front door', who: 'James Miller (Staff)', when: 'Jan 24, 09:00 AM', icon: 'person', tone: 'neutral' },
-  ];
+export function buildRealActivity(resource, schedules) {
+  const feed = [];
+  if (resource?.updatedAt) {
+    feed.push({
+      key: `resource-updated-${resource.resourceId ?? 'unknown'}`,
+      title: 'Resource details updated',
+      sub: `${resource.resourceCode || 'Resource'} · ${resource.status || 'UNKNOWN'}`,
+      who: 'System',
+      when: formatRelativeTime(resource.updatedAt),
+      icon: 'edit_note',
+      tone: 'primary',
+      at: resource.updatedAt,
+    });
+  }
+
+  const scheduleItems = (Array.isArray(schedules) ? schedules : [])
+    .filter((s) => s?.updatedAt || s?.createdAt)
+    .map((s) => ({
+      key: `schedule-${s.scheduleId ?? Math.random()}`,
+      title: 'Schedule window updated',
+      sub: `${String(s.scheduleDate || '')} ${String(s.startTime || '').slice(0, 5)}-${String(
+        s.endTime || ''
+      ).slice(0, 5)}`,
+      who: 'System',
+      when: formatRelativeTime(s.updatedAt || s.createdAt),
+      icon: 'schedule',
+      tone: 'tertiary',
+      at: s.updatedAt || s.createdAt,
+    }));
+  feed.push(...scheduleItems);
+
+  return feed
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, 5)
+    .map(({ at, ...item }) => item);
 }
 
 export function todayIsoLocal() {

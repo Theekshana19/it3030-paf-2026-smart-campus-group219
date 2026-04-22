@@ -2,6 +2,7 @@ package lk.sliit.smartcampus.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -185,11 +186,15 @@ public class DashboardServiceImpl implements DashboardService {
               .build());
     }
 
-    feed.sort(
+    LocalDateTime cutoff = LocalDateTime.now().minus(24, ChronoUnit.HOURS);
+    feed = feed.stream().filter(i -> i.getOccurredAt() != null && !i.getOccurredAt().isBefore(cutoff)).toList();
+
+    List<RecentChangeItemResponse> mutable = new ArrayList<>(feed);
+    mutable.sort(
         Comparator.comparing(
                 RecentChangeItemResponse::getOccurredAt, Comparator.nullsLast(Comparator.naturalOrder()))
             .reversed());
-    return feed;
+    return mutable;
   }
 
   private static String toLabel(ResourceType type) {

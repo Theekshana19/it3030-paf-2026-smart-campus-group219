@@ -9,6 +9,7 @@ import lk.sliit.smartcampus.entity.Resource;
 import lk.sliit.smartcampus.entity.ResourceStatusSchedule;
 import lk.sliit.smartcampus.exception.ResourceNotFoundException;
 import lk.sliit.smartcampus.exception.ScheduleNotFoundException;
+import lk.sliit.smartcampus.exception.ScheduleOverlapException;
 import lk.sliit.smartcampus.mapper.ResourceStatusScheduleMapper;
 import lk.sliit.smartcampus.repository.ResourceRepository;
 import lk.sliit.smartcampus.repository.ResourceStatusScheduleRepository;
@@ -38,6 +39,7 @@ public class ResourceStatusScheduleServiceImpl implements ResourceStatusSchedule
       Long resourceId, ResourceStatusScheduleCreateRequest request) {
     Resource resource =
         resourceRepository.findById(resourceId).orElseThrow(() -> new ResourceNotFoundException(resourceId));
+    validateNoOverlap(resourceId, request.getScheduleDate(), request.getStartTime(), request.getEndTime(), null);
     ResourceStatusSchedule entity = resourceStatusScheduleMapper.toNewEntity(resource, request);
     LocalDateTime now = LocalDateTime.now();
     entity.setCreatedAt(now);
@@ -70,6 +72,8 @@ public class ResourceStatusScheduleServiceImpl implements ResourceStatusSchedule
   public ResourceStatusScheduleResponse update(
       Long resourceId, Long scheduleId, ResourceStatusScheduleUpdateRequest request) {
     ResourceStatusSchedule entity = loadSchedule(resourceId, scheduleId);
+    validateNoOverlap(
+        resourceId, request.getScheduleDate(), request.getStartTime(), request.getEndTime(), scheduleId);
     resourceStatusScheduleMapper.apply(entity, request);
     entity.setUpdatedAt(LocalDateTime.now());
     ResourceStatusSchedule saved = resourceStatusScheduleRepository.save(entity);
@@ -92,5 +96,24 @@ public class ResourceStatusScheduleServiceImpl implements ResourceStatusSchedule
       throw new ScheduleNotFoundException(scheduleId);
     }
     return entity;
+  }
+
+  private void validateNoOverlap(
+      Long resourceId,
+      java.time.LocalDate scheduleDate,
+      java.time.LocalTime startTime,
+      java.time.LocalTime endTime,
+      Long ignoreScheduleId) {
+    if (scheduleDate == null || startTime == null || endTime == null) return;
+    List<ResourceStatusSchedule> existing =
+        resourceStatusScheduleRepository.findByResource_ResourceIdAndScheduleDate(resourceId, scheduleDate);
+    boolean overlaps =
+        existing.stream()
+            .filter(s -> Boolean.TRUE.equals(s.getIsActive()))
+            .filter(s -> ignoreScheduleId == null || !ignoreScheduleId.equals(s.getScheduleId()))
+            .anyMatch(s -> startTime.isBefore(s.getEndTime()) && endTime.isAfter(s.getStartTime()));
+    if (overlaps) {
+      throw new ScheduleOverlapException(resourceId);
+    }
   }
 }

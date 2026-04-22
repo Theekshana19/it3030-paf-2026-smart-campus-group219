@@ -15,7 +15,7 @@ import ResourceActiveTagsCard from '../components/ResourceActiveTagsCard.jsx';
 import ResourceOptimizationCard from '../components/ResourceOptimizationCard.jsx';
 import {
   buildDetailsTimelineSegments,
-  buildFallbackActivity,
+  buildRealActivity,
   buildOperatingHoursRows,
   formatResourcePathLabel,
   todayIsoLocal,
@@ -80,7 +80,7 @@ export default function ResourceDetailsPage() {
     return buildDetailsTimelineSegments(todaySchedules);
   }, [schedules]);
 
-  const activities = useMemo(() => buildFallbackActivity(resource), [resource]);
+  const activities = useMemo(() => buildRealActivity(resource, schedules), [resource, schedules]);
 
   const handleDelete = useCallback(async () => {
     if (!resourceId) return;
@@ -178,7 +178,7 @@ export default function ResourceDetailsPage() {
             note={
               resource?.smartAvailabilityStatus === 'OUT_OF_SERVICE'
                 ? 'Resource is currently out of service. Prioritize maintenance completion.'
-                : undefined
+                : 'No optimization insight available from backend data yet.'
             }
           />
         </div>

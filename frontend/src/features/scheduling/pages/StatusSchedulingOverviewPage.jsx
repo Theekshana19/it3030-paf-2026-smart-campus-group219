@@ -153,7 +153,8 @@ export default function StatusSchedulingOverviewPage() {
 
       {!data.supportsGlobalOverview ? (
         <div className="px-4 py-3 rounded-lg bg-amber-50 text-amber-700 text-sm border border-amber-200">
-          Global scheduling endpoint is not available yet. Showing aggregated data from resource schedule APIs.
+          Degraded mode: global overview endpoint is unavailable. Showing an approximate aggregation from
+          resource schedule APIs.
         </div>
       ) : null}
 

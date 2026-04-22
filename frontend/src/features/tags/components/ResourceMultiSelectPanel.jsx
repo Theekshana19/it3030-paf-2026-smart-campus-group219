@@ -74,6 +74,15 @@ export default function ResourceMultiSelectPanel({ mode, value = [], onChange, d
   }, [query, mode]);
 
   const selectedSet = useMemo(() => new Set(value || []), [value]);
+  const optionIds = useMemo(() => options.map((r) => Number(r.resourceId)), [options]);
+  const allSelected = useMemo(
+    () => optionIds.length > 0 && optionIds.every((id) => selectedSet.has(id)),
+    [optionIds, selectedSet]
+  );
+  const someSelected = useMemo(
+    () => !allSelected && optionIds.some((id) => selectedSet.has(id)),
+    [allSelected, optionIds, selectedSet]
+  );
 
   const toggle = useCallback(
     (row) => {
@@ -95,6 +104,17 @@ export default function ResourceMultiSelectPanel({ mode, value = [], onChange, d
     [disabled, onChange, value]
   );
 
+  const toggleSelectAll = useCallback(() => {
+    if (disabled || !optionIds.length) return;
+    if (allSelected) {
+      const optionIdSet = new Set(optionIds);
+      onChange((value || []).filter((id) => !optionIdSet.has(Number(id))));
+      return;
+    }
+    const merged = new Set([...(value || []), ...optionIds]);
+    onChange(Array.from(merged));
+  }, [allSelected, disabled, onChange, optionIds, value]);
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -114,6 +134,19 @@ export default function ResourceMultiSelectPanel({ mode, value = [], onChange, d
           className="w-full pl-10 pr-4 py-2.5 bg-surface-container-low border-none rounded-lg text-sm focus:ring-2 focus:ring-primary"
         />
       </div>
+      <label className="flex items-center gap-2 text-xs text-on-surface-variant cursor-pointer select-none">
+        <input
+          type="checkbox"
+          checked={allSelected}
+          ref={(el) => {
+            if (el) el.indeterminate = someSelected;
+          }}
+          disabled={disabled || loading || !optionIds.length}
+          onChange={toggleSelectAll}
+          className="rounded border-surface-container text-primary focus:ring-primary"
+        />
+        <span>{allSelected ? 'Unselect all resources' : 'Select all resources'}</span>
+      </label>
       {value?.length ? (
         <div className="flex flex-wrap gap-2">
           {value.map((id) => {

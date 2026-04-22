@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ResourceTagMappings")
+@Table(name = "resource_tag_mappings")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,18 +27,18 @@ public class ResourceTagMapping {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "ResourceTagMappingId")
+  @Column(name = "resource_tag_mapping_id")
   private Long resourceTagMappingId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "ResourceId", nullable = false)
+  @JoinColumn(name = "resource_id", nullable = false)
   private Resource resource;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "TagId", nullable = false)
+  @JoinColumn(name = "tag_id", nullable = false)
   private ResourceTag tag;
 
-  @Column(name = "CreatedAt", nullable = false, updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 }
 

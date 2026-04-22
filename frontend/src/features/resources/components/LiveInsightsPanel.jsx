@@ -16,7 +16,8 @@ import Icon from '../../../components/common/Icon.jsx';
  */
 export default function LiveInsightsPanel({ todayBookingCount, schedules = [] }) {
   const confirmed = todayBookingCount ?? 0;
-  const occupancyPct = 66; // Placeholder derived from catalogue UI mock.
+  const hasBookingMetric = todayBookingCount != null;
+  const occupancyPct = hasBookingMetric ? Math.min(100, Math.max(0, confirmed * 12)) : 0;
 
   return (
     <aside className="space-y-6">
@@ -36,9 +37,13 @@ export default function LiveInsightsPanel({ todayBookingCount, schedules = [] })
               <span className="text-sm text-secondary mb-1">Bookings Confirmed</span>
             </div>
             <div className="w-full bg-surface-container rounded-full h-2 overflow-hidden">
-              <div className="bg-primary w-2/3 h-full rounded-full" style={{ width: `${occupancyPct}%` }} />
+              <div className="bg-primary h-full rounded-full" style={{ width: `${occupancyPct}%` }} />
             </div>
-            <p className="text-[10px] text-secondary mt-2">66% occupancy predicted for today</p>
+            <p className="text-[10px] text-secondary mt-2">
+              {hasBookingMetric
+                ? `${occupancyPct}% based on today's confirmed bookings`
+                : 'Occupancy insight unavailable (booking metrics not integrated).'}
+            </p>
           </div>
 
           <div>
@@ -49,11 +54,11 @@ export default function LiveInsightsPanel({ todayBookingCount, schedules = [] })
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-surface p-3 rounded-lg border border-surface-container-highest">
               <p className="text-[10px] uppercase font-bold text-secondary mb-1">Energy</p>
-              <p className="text-sm font-bold text-tertiary">Eco-Mode</p>
+              <p className="text-sm font-bold text-on-surface-variant">No data</p>
             </div>
             <div className="bg-surface p-3 rounded-lg border border-surface-container-highest">
               <p className="text-[10px] uppercase font-bold text-secondary mb-1">Uptime</p>
-              <p className="text-sm font-bold text-primary">99.8%</p>
+              <p className="text-sm font-bold text-on-surface-variant">No data</p>
             </div>
           </div>
         </div>
