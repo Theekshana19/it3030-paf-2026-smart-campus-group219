@@ -13,6 +13,7 @@ import QuickActionsCard from '../components/QuickActionsCard.jsx';
 import RecentlyUpdatedSchedulesSection from '../components/RecentlyUpdatedSchedulesSection.jsx';
 import CreateScheduleDrawer from '../components/CreateScheduleDrawer.jsx';
 import { confirmDeleteAlert } from '../../../utils/sweetAlerts.js';
+import { exportScheduleListAsCsv } from '../utils/exportScheduleListCsv.js';
 
 const defaultFilters = {
   search: '',
@@ -83,6 +84,23 @@ export default function StatusSchedulingOverviewPage() {
     setIsCreateDrawerOpen(true);
   }, []);
 
+  const handleExportScheduleList = useCallback(() => {
+    if (loading) {
+      toast.message('Please wait until the schedule list finishes loading.');
+      return;
+    }
+    if (!data.items?.length) {
+      toast.message('No schedules to export for the current filters.');
+      return;
+    }
+    try {
+      exportScheduleListAsCsv(data.items);
+      toast.success(`Exported ${data.items.length} row(s) to CSV.`);
+    } catch (e) {
+      toast.error(getErrorMessage(e));
+    }
+  }, [data.items, loading]);
+
   const handleDeleteSchedule = useCallback(
     async (row) => {
       const confirmed = await confirmDeleteAlert({
@@ -108,7 +126,7 @@ export default function StatusSchedulingOverviewPage() {
     <div className="p-8 space-y-8">
       <SchedulingOverviewHeader
         onCreate={() => setIsCreateDrawerOpen(true)}
-        onExport={() => toast.message('Export generation can be connected to CSV endpoint.')}
+        onExport={handleExportScheduleList}
       />
 
       {!data.supportsGlobalOverview ? (
