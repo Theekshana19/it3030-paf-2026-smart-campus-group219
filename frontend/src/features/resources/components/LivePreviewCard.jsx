@@ -1,7 +1,6 @@
 import Icon from '../../../components/common/Icon.jsx';
 
-const PREVIEW_IMG =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBCr6ac113aaiWCmFkLxJHJaCJ4YDWvWX9w_bXOmfEMtciha_OQ7EZePCIqDZmdR64TRpUvLJ_mNYPTJ1UW0y-ClyD1HdRY6NuLfeCafees0f7Lf0EGDK-mGl0INALEe8gbLWVJPXoeEe_dV3A75dxNn7DJGo8lHezMWJMOnCzvj9ge1WbRi8-rID6xArT6Im-9VBFzT9bcsx9EoPKmkWuKWaP6DBL9fuGWYMwVxCPXCLTIldC0UKqm14Ms7_dXuKJWK_NSN6ogFAW0';
+const PREVIEW_IMG = '/images/live-preview.webp';
 
 /**
  * @param {{
