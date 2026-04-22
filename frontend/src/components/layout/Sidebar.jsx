@@ -82,7 +82,6 @@ export default function Sidebar() {
           label="Tag Management"
           isCustomActive={tagManagementNavActive}
         />
-        <NavItem to="/settings" icon="settings" label="Settings" />
       </nav>
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">
         <button
