@@ -27,6 +27,17 @@ public interface ResourceRepository
 
   List<Resource> findByCapacityGreaterThanEqual(Integer minCapacity);
 
+  long countByStatus(ResourceStatus status);
+
+  @Query("select r.resourceType, count(r) from Resource r group by r.resourceType")
+  List<Object[]> countByResourceType();
+
+  @Query("select r from Resource r order by r.updatedAt desc")
+  Page<Resource> findRecentUpdated(Pageable pageable);
+
+  @Query("select r from Resource r order by r.createdAt desc")
+  Page<Resource> findRecentCreated(Pageable pageable);
+
   @Query(
       """
       select r from Resource r

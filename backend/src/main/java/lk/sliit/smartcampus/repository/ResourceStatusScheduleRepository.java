@@ -8,6 +8,8 @@ import lk.sliit.smartcampus.enums.ScheduledStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ResourceStatusScheduleRepository
     extends JpaRepository<ResourceStatusSchedule, Long> {
@@ -17,6 +19,11 @@ public interface ResourceStatusScheduleRepository
 
   List<ResourceStatusSchedule> findByResource_ResourceIdAndScheduleDate(
       Long resourceId, LocalDate scheduleDate);
+
+  List<ResourceStatusSchedule> findByScheduleDate(LocalDate scheduleDate);
+
+  @Query("select s from ResourceStatusSchedule s join fetch s.resource r order by s.updatedAt desc")
+  Page<ResourceStatusSchedule> findRecentUpdated(Pageable pageable);
 
   void deleteByResource_ResourceId(Long resourceId);
 
