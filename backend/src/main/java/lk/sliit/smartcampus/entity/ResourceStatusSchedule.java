@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "ResourceStatusSchedules")
+@Table(name = "resource_status_schedules")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,36 +32,36 @@ public class ResourceStatusSchedule {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "ScheduleId")
+  @Column(name = "schedule_id")
   private Long scheduleId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
-  @JoinColumn(name = "ResourceId", nullable = false)
+  @JoinColumn(name = "resource_id", nullable = false)
   private Resource resource;
 
-  @Column(name = "ScheduleDate", nullable = false)
+  @Column(name = "schedule_date", nullable = false)
   private LocalDate scheduleDate;
 
-  @Column(name = "StartTime", nullable = false)
+  @Column(name = "start_time", nullable = false)
   private LocalTime startTime;
 
-  @Column(name = "EndTime", nullable = false)
+  @Column(name = "end_time", nullable = false)
   private LocalTime endTime;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "ScheduledStatus", nullable = false, length = 30)
+  @Column(name = "scheduled_status", nullable = false, length = 30)
   private ScheduledStatus scheduledStatus;
 
-  @Column(name = "ReasonNote", length = 300)
+  @Column(name = "reason_note", length = 300)
   private String reasonNote;
 
-  @Column(name = "IsActive", nullable = false)
+  @Column(name = "is_active", nullable = false)
   private Boolean isActive;
 
-  @Column(name = "CreatedAt", nullable = false, updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "UpdatedAt", nullable = false)
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 }
 

@@ -4,6 +4,7 @@ import lk.sliit.smartcampus.dto.request.ResourceCreateRequest;
 import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
 import lk.sliit.smartcampus.dto.response.ResourceResponse;
+import lk.sliit.smartcampus.dto.response.UntaggedResourceListResponse;
 import lk.sliit.smartcampus.enums.ResourceStatus;
 import lk.sliit.smartcampus.enums.ResourceType;
 
@@ -28,4 +29,7 @@ public interface ResourceService {
       Integer size,
       String sortBy,
       String sortDir);
+
+  UntaggedResourceListResponse findUntagged(
+      String search, Integer page, Integer size, String sortBy, String sortDir);
 }

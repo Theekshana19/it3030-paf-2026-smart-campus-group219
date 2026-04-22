@@ -13,6 +13,9 @@ import TicketListPage from '../features/tickets/pages/TicketListPage.jsx';
 import CreateTicketPage from '../features/tickets/pages/CreateTicketPage.jsx';
 import TicketDetailsPage from '../features/tickets/pages/TicketDetailsPage.jsx';
 import EditTicketPage from '../features/tickets/pages/EditTicketPage.jsx';
+import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
+import TagManagementPage from '../features/tags/pages/TagManagementPage.jsx';
+import DashboardPage from '../features/dashboard/pages/DashboardPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -30,7 +33,8 @@ export const router = createBrowserRouter([
     path: '/',
     element: <DashboardLayout />,
     children: [
-      { index: true, element: <PlaceholderPage title="Dashboard" />, handle: { crumb: 'Dashboard' } },
+      { index: true, element: <Navigate to="/dashboard" replace />, handle: { crumb: 'Dashboard' } },
+      { path: 'dashboard', element: <DashboardPage />, handle: { crumb: 'Dashboard' } },
       {
         path: 'resources',
         element: <ResourceCataloguePage />,
@@ -55,6 +59,11 @@ export const router = createBrowserRouter([
         path: 'resources/:resourceId',
         element: <ResourceDetailsPage />,
         handle: { crumb: 'Resource details' },
+      },
+      {
+        path: 'status-scheduling',
+        element: <StatusSchedulingOverviewPage />,
+        handle: { crumb: 'Status scheduling' },
       },
       {
         path: 'bookings',
@@ -98,13 +107,18 @@ export const router = createBrowserRouter([
       },
       {
         path: 'scheduling',
-        element: <PlaceholderPage title="Status scheduling" />,
-        handle: { crumb: 'Scheduling' },
+        element: <Navigate to="/status-scheduling" replace />,
+        handle: { crumb: 'Status scheduling' },
+      },
+      {
+        path: 'tag-management',
+        element: <TagManagementPage />,
+        handle: { crumb: 'Campus Tag Manager' },
       },
       {
         path: 'tags',
-        element: <PlaceholderPage title="Tag management" />,
-        handle: { crumb: 'Tags' },
+        element: <Navigate to="/tag-management" replace />,
+        handle: { crumb: 'Campus Tag Manager' },
       },
       {
         path: 'settings',

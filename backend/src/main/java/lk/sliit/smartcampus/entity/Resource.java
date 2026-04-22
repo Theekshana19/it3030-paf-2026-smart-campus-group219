@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "Resources")
+@Table(name = "resources")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,63 +29,63 @@ public class Resource {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "ResourceId")
+  @Column(name = "resource_id")
   private Long resourceId;
 
-  @Column(name = "ResourceCode", nullable = false, unique = true, length = 50)
+  @Column(name = "resource_code", nullable = false, unique = true, length = 50)
   private String resourceCode;
 
-  @Column(name = "ResourceName", nullable = false, length = 150)
+  @Column(name = "resource_name", nullable = false, length = 150)
   private String resourceName;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "ResourceType", nullable = false, length = 30)
+  @Column(name = "resource_type", nullable = false, length = 30)
   private ResourceType resourceType;
 
-  @Column(name = "EquipmentSubtype", length = 80)
+  @Column(name = "equipment_subtype", length = 80)
   private String equipmentSubtype;
 
-  @Column(name = "Capacity")
+  @Column(name = "capacity")
   private Integer capacity;
 
-  @Column(name = "Building", length = 100)
+  @Column(name = "building", nullable = false, length = 100)
   private String building;
 
-  @Column(name = "Floor", length = 30)
+  @Column(name = "floor", length = 30)
   private String floor;
 
-  @Column(name = "RoomOrAreaIdentifier", length = 80)
+  @Column(name = "room_or_area_identifier", length = 80)
   private String roomOrAreaIdentifier;
 
-  @Column(name = "FullLocationDescription", length = 300)
+  @Column(name = "full_location_description", length = 300)
   private String fullLocationDescription;
 
-  @Column(name = "DefaultAvailableFrom")
+  @Column(name = "default_available_from", nullable = false)
   private LocalTime defaultAvailableFrom;
 
-  @Column(name = "DefaultAvailableTo")
+  @Column(name = "default_available_to", nullable = false)
   private LocalTime defaultAvailableTo;
 
-  @Column(name = "WorkingDays", length = 120)
+  @Column(name = "working_days", length = 120)
   private String workingDays;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "Status", nullable = false, length = 30)
+  @Column(name = "status", nullable = false, length = 30)
   private ResourceStatus status;
 
-  @Column(name = "StatusNotes", length = 300)
+  @Column(name = "status_notes", length = 300)
   private String statusNotes;
 
-  @Column(name = "Description", length = 1000)
+  @Column(name = "description", length = 1000)
   private String description;
 
-  @Column(name = "IsActive", nullable = false)
+  @Column(name = "is_active", nullable = false)
   private Boolean isActive;
 
-  @Column(name = "CreatedAt", nullable = false, updatable = false)
+  @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "UpdatedAt", nullable = false)
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
 }
 

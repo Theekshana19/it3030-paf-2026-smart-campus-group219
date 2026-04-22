@@ -10,6 +10,8 @@ import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
 import lk.sliit.smartcampus.dto.response.ResourceResponse;
 import lk.sliit.smartcampus.dto.response.ResourceTagResponse;
+import lk.sliit.smartcampus.dto.response.UntaggedResourceListResponse;
+import lk.sliit.smartcampus.dto.response.UntaggedResourceSummaryResponse;
 import lk.sliit.smartcampus.entity.Resource;
 import lk.sliit.smartcampus.entity.ResourceStatusSchedule;
 import lk.sliit.smartcampus.entity.ResourceTagMapping;
@@ -148,6 +150,52 @@ public class ResourceServiceImpl implements ResourceService {
         .page(resourcePage.getNumber())
         .size(resourcePage.getSize())
         .totalPages(resourcePage.getTotalPages())
+        .build();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public UntaggedResourceListResponse findUntagged(
+      String search, Integer page, Integer size, String sortBy, String sortDir) {
+    if (page < 0) {
+      throw new IllegalArgumentException("page must be greater than or equal to 0");
+    }
+    if (size < 1 || size > 100) {
+      throw new IllegalArgumentException("size must be between 1 and 100");
+    }
+    if (!"asc".equalsIgnoreCase(sortDir) && !"desc".equalsIgnoreCase(sortDir)) {
+      throw new IllegalArgumentException("sortDir must be either 'asc' or 'desc'");
+    }
+    if (!StringUtils.hasText(sortBy) || !ALLOWED_SORT_FIELDS.contains(sortBy)) {
+      throw new IllegalArgumentException(
+          "sortBy must be one of: " + String.join(", ", ALLOWED_SORT_FIELDS));
+    }
+    String needle = search != null ? search.trim() : "";
+    Sort sort =
+        "desc".equalsIgnoreCase(sortDir)
+            ? Sort.by(sortBy).descending()
+            : Sort.by(sortBy).ascending();
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<Resource> resourcePage = resourceRepository.findUntagged(needle, pageable);
+    List<UntaggedResourceSummaryResponse> items =
+        resourcePage.getContent().stream().map(this::toUntaggedSummary).toList();
+    return UntaggedResourceListResponse.builder()
+        .items(items)
+        .totalItems(resourcePage.getTotalElements())
+        .page(resourcePage.getNumber())
+        .size(resourcePage.getSize())
+        .totalPages(resourcePage.getTotalPages())
+        .build();
+  }
+
+  private UntaggedResourceSummaryResponse toUntaggedSummary(Resource r) {
+    return UntaggedResourceSummaryResponse.builder()
+        .resourceId(r.getResourceId())
+        .resourceName(r.getResourceName())
+        .resourceCode(r.getResourceCode())
+        .building(r.getBuilding())
+        .floor(r.getFloor())
+        .roomOrAreaIdentifier(r.getRoomOrAreaIdentifier())
         .build();
   }
 

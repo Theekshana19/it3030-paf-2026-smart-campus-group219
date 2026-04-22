@@ -2,8 +2,11 @@ package lk.sliit.smartcampus.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import lk.sliit.smartcampus.dto.request.ResourceTagBulkAssignRequest;
 import lk.sliit.smartcampus.dto.request.ResourceTagCreateRequest;
 import lk.sliit.smartcampus.dto.request.ResourceTagUpdateRequest;
+import lk.sliit.smartcampus.dto.response.ResourceTagBulkAssignResponse;
+import lk.sliit.smartcampus.dto.response.ResourceTagOverviewResponse;
 import lk.sliit.smartcampus.dto.response.ResourceTagResponse;
 import lk.sliit.smartcampus.service.ResourceTagService;
 import org.springframework.http.HttpStatus;
@@ -30,6 +33,17 @@ public class ResourceTagController {
   @GetMapping
   public List<ResourceTagResponse> list() {
     return resourceTagService.findAll();
+  }
+
+  @GetMapping("/overview")
+  public ResourceTagOverviewResponse overview() {
+    return resourceTagService.getOverview();
+  }
+
+  @PostMapping("/bulk-assign")
+  public ResponseEntity<ResourceTagBulkAssignResponse> bulkAssign(
+      @Valid @RequestBody ResourceTagBulkAssignRequest request) {
+    return ResponseEntity.ok(resourceTagService.bulkAssign(request));
   }
 
   @GetMapping("/{id}")

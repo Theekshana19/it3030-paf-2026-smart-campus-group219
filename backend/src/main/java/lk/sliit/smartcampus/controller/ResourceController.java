@@ -8,6 +8,7 @@ import lk.sliit.smartcampus.dto.request.ResourceUpdateRequest;
 import lk.sliit.smartcampus.dto.response.ResourceListResponse;
 import lk.sliit.smartcampus.dto.response.ResourceResponse;
 import lk.sliit.smartcampus.dto.response.ResourceTagResponse;
+import lk.sliit.smartcampus.dto.response.UntaggedResourceListResponse;
 import lk.sliit.smartcampus.enums.ResourceStatus;
 import lk.sliit.smartcampus.enums.ResourceType;
 import lk.sliit.smartcampus.service.ResourceService;
@@ -86,6 +87,25 @@ public class ResourceController {
         size,
         sortBy,
         sortDir);
+  }
+
+  @GetMapping("/untagged")
+  public UntaggedResourceListResponse listUntagged(
+      @RequestParam(required = false) String search,
+      @RequestParam(defaultValue = "0") Integer page,
+      @RequestParam(defaultValue = "20") Integer size,
+      @RequestParam(defaultValue = "resourceName") String sortBy,
+      @RequestParam(defaultValue = "asc") String sortDir) {
+    if (page < 0) {
+      throw new IllegalArgumentException("page must be greater than or equal to 0");
+    }
+    if (size < 1 || size > 100) {
+      throw new IllegalArgumentException("size must be between 1 and 100");
+    }
+    if (!"asc".equalsIgnoreCase(sortDir) && !"desc".equalsIgnoreCase(sortDir)) {
+      throw new IllegalArgumentException("sortDir must be either 'asc' or 'desc'");
+    }
+    return resourceService.findUntagged(search, page, size, sortBy, sortDir);
   }
 
   @GetMapping("/{id}")

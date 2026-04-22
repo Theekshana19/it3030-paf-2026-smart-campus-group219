@@ -48,7 +48,15 @@ function ticketsNavActive({ pathname }) {
 }
 
 function schedulingNavActive({ pathname }) {
-  return pathname === '/scheduling' || pathname.endsWith('/schedules');
+  return pathname === '/status-scheduling' || pathname === '/scheduling' || pathname.endsWith('/schedules');
+}
+
+function tagManagementNavActive({ pathname }) {
+  return pathname === '/tag-management' || pathname === '/tags';
+}
+
+function dashboardNavActive({ pathname }) {
+  return pathname === '/' || pathname === '/dashboard';
 }
 
 export default function Sidebar() {
@@ -64,7 +72,7 @@ export default function Sidebar() {
         </div>
       </div>
       <nav className="flex-1 space-y-1">
-        <NavItem to="/" icon="dashboard" label="Dashboard" end />
+        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" isCustomActive={dashboardNavActive} />
         <NavItem
           to="/resources"
           icon="inventory_2"
@@ -87,13 +95,17 @@ export default function Sidebar() {
         />
         <NavItem to="/tickets/new" icon="report_problem" label="Report Issue" />
         <NavItem
-          to="/scheduling"
+          to="/status-scheduling"
           icon="calendar_today"
           label="Status Scheduling"
           isCustomActive={schedulingNavActive}
         />
-        <NavItem to="/tags" icon="sell" label="Tag Management" />
-        <NavItem to="/settings" icon="settings" label="Settings" />
+        <NavItem
+          to="/tag-management"
+          icon="sell"
+          label="Tag Management"
+          isCustomActive={tagManagementNavActive}
+        />
       </nav>
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">
         <button
