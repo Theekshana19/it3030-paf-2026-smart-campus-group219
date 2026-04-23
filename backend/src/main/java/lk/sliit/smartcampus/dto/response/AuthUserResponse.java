@@ -18,5 +18,6 @@ public class AuthUserResponse {
   private Boolean isActive;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private String token;
 }
 

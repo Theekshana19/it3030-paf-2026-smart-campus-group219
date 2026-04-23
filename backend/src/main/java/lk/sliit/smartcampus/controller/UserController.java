@@ -6,6 +6,7 @@ import lk.sliit.smartcampus.dto.request.UpdateUserRoleRequest;
 import lk.sliit.smartcampus.dto.response.AuthUserResponse;
 import lk.sliit.smartcampus.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,11 +24,13 @@ public class UserController {
     this.userService = userService;
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<List<AuthUserResponse>> getAllUsers() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{id}/role")
   public ResponseEntity<AuthUserResponse> updateUserRole(
       @PathVariable("id") Long userId, @Valid @RequestBody UpdateUserRoleRequest request) {
