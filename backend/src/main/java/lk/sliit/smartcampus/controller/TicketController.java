@@ -17,6 +17,7 @@ import lk.sliit.smartcampus.enums.TicketStatus;
 import lk.sliit.smartcampus.service.TicketAttachmentService;
 import lk.sliit.smartcampus.service.TicketService;
 import org.springframework.core.io.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -120,6 +121,7 @@ public class TicketController {
   }
 
   // admin assigns a technician to work on the ticket
+  @PreAuthorize("hasRole('ADMIN') or hasRole('TECHNICIAN')")
   @PatchMapping("/{ticketId}/assign")
   public TicketResponse assign(
       @PathVariable Long ticketId,
@@ -128,6 +130,7 @@ public class TicketController {
   }
 
   // technician marks the ticket as resolved with notes
+  @PreAuthorize("hasRole('ADMIN') or hasRole('TECHNICIAN')")
   @PatchMapping("/{ticketId}/resolve")
   public TicketResponse resolve(
       @PathVariable Long ticketId,
@@ -136,12 +139,14 @@ public class TicketController {
   }
 
   // admin closes a resolved ticket
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{ticketId}/close")
   public TicketResponse close(@PathVariable Long ticketId) {
     return ticketService.closeTicket(ticketId);
   }
 
   // admin rejects a ticket with a reason
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{ticketId}/reject")
   public TicketResponse reject(
       @PathVariable Long ticketId,

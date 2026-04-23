@@ -14,6 +14,7 @@ import lk.sliit.smartcampus.enums.ResourceType;
 import lk.sliit.smartcampus.service.ResourceService;
 import lk.sliit.smartcampus.service.ResourceTagMappingService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -49,6 +50,7 @@ public class ResourceController {
     return Map.of("connected", true, "module", "Member 1 Resources");
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<ResourceResponse> create(@Valid @RequestBody ResourceCreateRequest request) {
     ResourceResponse body = resourceService.create(request);
@@ -113,18 +115,21 @@ public class ResourceController {
     return resourceService.getById(id);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResourceResponse update(
       @PathVariable Long id, @Valid @RequestBody ResourceUpdateRequest request) {
     return resourceService.update(id, request);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable Long id) {
     resourceService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{resourceId}/tags/{tagId}")
   public ResponseEntity<Void> addTag(
       @PathVariable Long resourceId, @PathVariable Long tagId) {
@@ -137,6 +142,7 @@ public class ResourceController {
     return resourceTagMappingService.findTagsByResource(resourceId);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{resourceId}/tags/{tagId}")
   public ResponseEntity<Void> removeTag(
       @PathVariable Long resourceId, @PathVariable Long tagId) {
