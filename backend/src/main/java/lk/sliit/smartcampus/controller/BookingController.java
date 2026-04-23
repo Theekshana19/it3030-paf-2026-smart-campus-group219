@@ -14,6 +14,7 @@ import lk.sliit.smartcampus.enums.BookingStatus;
 import lk.sliit.smartcampus.service.BookingService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +106,7 @@ public class BookingController {
   }
 
   // admin approves or rejects a booking
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{bookingId}/review")
   public BookingResponse review(
       @PathVariable Long bookingId,
