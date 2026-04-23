@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -52,6 +54,24 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ApiErrorResponse> handleInvalidState(
       RuntimeException exception, HttpServletRequest request) {
     return build(HttpStatus.BAD_REQUEST, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(UnauthorizedException.class)
+  public ResponseEntity<ApiErrorResponse> handleUnauthorized(
+      UnauthorizedException exception, HttpServletRequest request) {
+    return build(HttpStatus.UNAUTHORIZED, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ApiErrorResponse> handleAuthenticationException(
+      AuthenticationException exception, HttpServletRequest request) {
+    return build(HttpStatus.UNAUTHORIZED, exception.getMessage(), request);
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ApiErrorResponse> handleAccessDenied(
+      AccessDeniedException exception, HttpServletRequest request) {
+    return build(HttpStatus.FORBIDDEN, "Access denied", request);
   }
 
   @ExceptionHandler(CommentOwnershipException.class)

@@ -30,8 +30,11 @@ public class User {
   @Column(name = "user_id")
   private Long userId;
 
-  @Column(name = "google_sub", nullable = false, unique = true, length = 255)
+  @Column(name = "google_sub", nullable = true, unique = true, length = 255)
   private String googleSub;
+
+  @Column(name = "password_hash", length = 255)
+  private String passwordHash;
 
   @Column(name = "email", nullable = false, unique = true, length = 255)
   private String email;
