@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -84,11 +85,11 @@ public class TicketAttachmentServiceImpl implements TicketAttachmentService {
         : ".png";
     String storedName = UUID.randomUUID() + extension;
 
-    Path uploadPath = Paths.get(UPLOAD_DIR, String.valueOf(ticketId));
+    Path uploadPath = Paths.get(UPLOAD_DIR, String.valueOf(ticketId)).toAbsolutePath();
     try {
       Files.createDirectories(uploadPath);
       Path filePath = uploadPath.resolve(storedName);
-      file.transferTo(filePath.toFile());
+      Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
       TicketAttachment attachment = TicketAttachment.builder()
           .ticket(ticket)
