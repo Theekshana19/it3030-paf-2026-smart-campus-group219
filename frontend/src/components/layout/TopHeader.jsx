@@ -1,12 +1,53 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useMatches } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useMatches, useNavigate } from 'react-router-dom';
 import Icon from '../common/Icon.jsx';
 import { getResourceById } from '../../features/resources/api/resourcesApi.js';
+import { useAuth } from '../../features/auth/hooks/useAuth.js';
+import { useNotifications } from '../../features/notifications/hooks/useNotifications.js';
+import NotificationPanel from '../../features/notifications/components/NotificationPanel.jsx';
 
-const AVATAR_SRC =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuCw25ZT-KYKlBFBrQ2CGdHDD9XiQnjngGoNOpNVSc2xA8RL7rWNPmaxwR5N_qTwJtYWmEHU35YGs8DQoJFHKF1Pvum8BnB64IhVe2HWIgcwPa2d0rfctOw2Vi-X42A1vQTFoB7Wf0Z-DtNGnF2Pl717OOAsX9hSywHgeTM7Iekl_UO6D_c_TZssF6y9yndSEymr_-S55cBBVQUSQhbw1Jzol3VquFA0dAiH19tn-SLdyLZrcx_9f8TMgCxcf2cMLF4oUHID1lk7VvOX';
+const ROLE_BADGE = {
+  ADMIN: { label: 'Admin', cls: 'bg-primary/10 text-primary' },
+  TECHNICIAN: { label: 'Tech', cls: 'bg-tertiary/10 text-tertiary' },
+  USER: { label: 'User', cls: 'bg-secondary/10 text-secondary' },
+};
+
+function UserAvatar({ user }) {
+  if (user?.profileImageUrl) {
+    return (
+      <img
+        alt={user.displayName ?? 'User'}
+        className="w-9 h-9 rounded-full border-2 border-primary/10 object-cover"
+        src={user.profileImageUrl}
+      />
+    );
+  }
+  const initials = (user?.displayName ?? 'U')
+    .split(' ')
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+  return (
+    <div className="w-9 h-9 rounded-full border-2 border-primary/10 bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">
+      {initials}
+    </div>
+  );
+}
 
 export default function TopHeader() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const {
+    notifications,
+    unreadCount,
+    loading: notifLoading,
+    open: notifOpen,
+    panelRef: notifPanelRef,
+    handleOpen: openNotifPanel,
+    handleMarkRead,
+    handleMarkAllRead,
+  } = useNotifications();
   const matches = useMatches();
   const crumb =
     [...matches].reverse().find((m) => m.handle?.crumb)?.handle?.crumb ?? 'Dashboard';
@@ -27,16 +68,31 @@ export default function TopHeader() {
         const r = await getResourceById(editResourceId);
         if (!cancelled) setEditName(r?.resourceName ?? null);
       } catch {
-        // Keep breadcrumb readable even when the fetch fails.
+        // keep breadcrumb readable even when fetch fails
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [editResourceId]);
 
   const headerLabel =
     editResourceId && editName ? `Edit Resource: ${editName}` : editResourceId ? 'Edit Resource' : crumb;
+
+  // User menu dropdown
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (e) => { if (!menuRef.current?.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [menuOpen]);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
+  const badge = user?.role ? ROLE_BADGE[user.role] ?? ROLE_BADGE.USER : null;
 
   return (
     <header className="bg-[#f6fafe] shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)] flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40">
@@ -45,7 +101,9 @@ export default function TopHeader() {
         <span className="mx-3 text-outline-variant shrink-0">/</span>
         <span className="text-sm font-medium text-secondary truncate">{headerLabel}</span>
       </div>
+
       <div className="flex items-center gap-5 shrink-0">
+        {/* Search */}
         <div className="relative hidden md:flex items-center bg-surface-container rounded-full px-4 py-2 focus-within:ring-2 ring-primary/20 transition-all">
           <Icon name="search" className="text-on-surface-variant mr-2 text-xl" />
           <input
@@ -55,15 +113,33 @@ export default function TopHeader() {
             aria-label="Search facilities"
           />
         </div>
+
         <div className="flex items-center gap-3 border-l border-outline-variant/30 pl-5">
-          <button
-            type="button"
-            className="p-2 rounded-full hover:bg-[#eaeef2] transition-colors relative"
-            aria-label="Notifications"
-          >
-            <Icon name="notifications" className="text-secondary" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full" />
-          </button>
+          {/* Notification bell */}
+          <div className="relative" ref={notifPanelRef}>
+            <button
+              type="button"
+              onClick={openNotifPanel}
+              className="p-2 rounded-full hover:bg-[#eaeef2] transition-colors relative"
+              aria-label="Notifications"
+            >
+              <Icon name="notifications" className="text-secondary" />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[1rem] h-4 bg-error rounded-full text-white text-[10px] font-bold flex items-center justify-center px-0.5">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+            {notifOpen && (
+              <NotificationPanel
+                notifications={notifications}
+                loading={notifLoading}
+                onMarkRead={handleMarkRead}
+                onMarkAllRead={handleMarkAllRead}
+              />
+            )}
+          </div>
+
           <button
             type="button"
             className="p-2 rounded-full hover:bg-[#eaeef2] transition-colors"
@@ -71,13 +147,40 @@ export default function TopHeader() {
           >
             <Icon name="help" className="text-secondary" />
           </button>
-          <div className="flex items-center gap-2.5 ml-1 cursor-pointer hover:bg-surface-container-low p-1.5 rounded-lg transition-all">
-            <img
-              alt="Admin"
-              className="w-9 h-9 rounded-full border-2 border-primary/10 object-cover"
-              src={AVATAR_SRC}
-            />
-            <Icon name="settings" className="text-secondary text-xl" />
+
+          {/* User menu */}
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((o) => !o)}
+              className="flex items-center gap-2.5 ml-1 hover:bg-surface-container-low p-1.5 rounded-lg transition-all"
+              aria-label="User menu"
+            >
+              <UserAvatar user={user} />
+              {badge && (
+                <span className={`hidden md:inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${badge.cls}`}>
+                  {badge.label}
+                </span>
+              )}
+              <Icon name="expand_more" className="text-secondary text-xl" />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-outline-variant/30 py-1 z-50">
+                <div className="px-4 py-2 border-b border-outline-variant/20">
+                  <p className="text-sm font-semibold text-on-surface truncate">{user?.displayName}</p>
+                  <p className="text-xs text-on-surface-variant truncate">{user?.email}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error hover:bg-error/5 transition-colors"
+                >
+                  <Icon name="logout" className="text-base" />
+                  Sign out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../common/Icon.jsx';
+import { useAuth } from '../../features/auth/hooks/useAuth.js';
 
 const navItemClass =
   'text-slate-300 hover:text-white flex items-center px-4 py-3 mx-2 my-1 transition-all hover:bg-[#4F46E5]/20 cursor-pointer rounded-lg group';
@@ -60,6 +61,15 @@ function dashboardNavActive({ pathname }) {
 }
 
 export default function Sidebar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const isAdmin = user?.role === 'ADMIN';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <aside className="h-screen w-64 fixed left-0 top-0 bg-[#545f73] dark:bg-slate-900 flex flex-col py-7 shadow-2xl z-50">
       <div className="px-6 mb-8 flex items-center gap-3">
@@ -71,6 +81,7 @@ export default function Sidebar() {
           <p className="text-xs text-slate-300 font-manrope">University Facilities</p>
         </div>
       </div>
+
       <nav className="flex-1 space-y-1">
         <NavItem to="/dashboard" icon="dashboard" label="Dashboard" isCustomActive={dashboardNavActive} />
         <NavItem
@@ -79,7 +90,9 @@ export default function Sidebar() {
           label="Resources Catalogue"
           isCustomActive={catalogueNavActive}
         />
-        <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
+        {isAdmin && (
+          <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
+        )}
         <NavItem
           to="/bookings"
           icon="event_note"
@@ -105,23 +118,30 @@ export default function Sidebar() {
           isCustomActive={tagManagementNavActive}
         />
       </nav>
+
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">
         <button
           type="button"
+          onClick={() => navigate('/resources')}
           className="bg-white text-[#3525cd] font-bold py-2.5 px-4 rounded-lg w-full text-xs font-manrope shadow-sm hover:scale-95 transition-transform"
         >
           Quick Schedule
         </button>
       </div>
+
       <div className="border-t border-slate-600/50 pt-4">
         <div className="text-slate-300 hover:text-white flex items-center px-4 py-2 mx-2 cursor-pointer rounded-lg group">
           <Icon name="contact_support" className="mr-3 text-sm" />
           <span className="font-manrope text-sm tracking-wide">Support</span>
         </div>
-        <div className="text-slate-300 hover:text-white flex items-center px-4 py-2 mx-2 cursor-pointer rounded-lg group">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full text-slate-300 hover:text-white flex items-center px-4 py-2 mx-2 cursor-pointer rounded-lg group transition-colors"
+        >
           <Icon name="logout" className="mr-3 text-sm" />
           <span className="font-manrope text-sm tracking-wide">Logout</span>
-        </div>
+        </button>
       </div>
     </aside>
   );
