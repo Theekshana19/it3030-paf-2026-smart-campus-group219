@@ -21,14 +21,10 @@ BEGIN
         updated_at DATETIME2(7) NOT NULL CONSTRAINT DF_resources_updated_at DEFAULT (SYSUTCDATETIME()),
         CONSTRAINT PK_resources PRIMARY KEY (resource_id),
         CONSTRAINT UQ_resources_resource_code UNIQUE (resource_code),
-        CONSTRAINT CK_resources_resource_type
-            CHECK (resource_type IN (N'LECTURE_HALL', N'LAB', N'MEETING_ROOM', N'EQUIPMENT')),
-        CONSTRAINT CK_resources_status
-            CHECK (status IN (N'ACTIVE', N'OUT_OF_SERVICE')),
-        CONSTRAINT CK_resources_capacity
-            CHECK (capacity IS NULL OR capacity >= 0),
-        CONSTRAINT CK_resources_availability_window
-            CHECK (default_available_from < default_available_to)
+        CONSTRAINT CK_resources_resource_type CHECK (resource_type IN (N'LECTURE_HALL', N'LAB', N'MEETING_ROOM', N'EQUIPMENT')),
+        CONSTRAINT CK_resources_status CHECK (status IN (N'ACTIVE', N'OUT_OF_SERVICE')),
+        CONSTRAINT CK_resources_capacity CHECK (capacity IS NULL OR capacity >= 0),
+        CONSTRAINT CK_resources_availability_window CHECK (default_available_from < default_available_to)
     );
 END
 GO

@@ -1,0 +1,781 @@
+{
+  "info": {
+    "name": "SmartCampus API",
+    "_postman_id": "smartcampus-api-v1",
+    "description": "Complete API collection for Smart Campus backend (Spring Boot, port 8080).\n\nSetup:\n1. Set the `token` variable after a successful Google auth call.\n2. All protected endpoints use Bearer auth via the collection-level auth config.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token",   "value": "",                      "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Google Sign-In",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.token) {",
+                "  pm.collectionVariables.set('token', json.token);",
+                "  console.log('Token saved to collection variable.');",
+                "}"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"googleToken\": \"<PASTE_GOOGLE_ID_TOKEN_HERE>\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/google", "host": ["{{baseUrl}}"], "path": ["api","auth","google"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Register (manual)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.token) {",
+                "  pm.collectionVariables.set('token', json.token);",
+                "  console.log('Token saved to collection variable.');",
+                "}"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"John Doe\",\n  \"email\": \"john@sliit.lk\",\n  \"password\": \"secret123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Login (manual)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.token) {",
+                "  pm.collectionVariables.set('token', json.token);",
+                "  console.log('Token saved to collection variable.');",
+                "}"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@sliit.lk\",\n  \"password\": \"secret123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api","auth","me"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List All Users (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api","users"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Role (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/users/1/role", "host": ["{{baseUrl}}"], "path": ["api","users","1","role"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Resources",
+      "item": [
+        {
+          "name": "DB Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resources/test-db", "host": ["{{baseUrl}}"], "path": ["api","resources","test-db"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Resource (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceCode\": \"LAB-101\",\n  \"resourceName\": \"Computer Lab 101\",\n  \"resourceType\": \"LAB\",\n  \"equipmentSubtype\": null,\n  \"capacity\": 30,\n  \"building\": \"Building A\",\n  \"floor\": \"1\",\n  \"roomOrAreaIdentifier\": \"101\",\n  \"fullLocationDescription\": \"Ground floor, Building A\",\n  \"defaultAvailableFrom\": \"08:00:00\",\n  \"defaultAvailableTo\": \"18:00:00\",\n  \"workingDays\": \"MON,TUE,WED,THU,FRI\",\n  \"status\": \"ACTIVE\",\n  \"statusNotes\": null,\n  \"description\": \"Main computer lab with 30 workstations\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resources", "host": ["{{baseUrl}}"], "path": ["api","resources"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Resources",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resources?page=0&size=10&sortBy=resourceId&sortDir=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","resources"],
+              "query": [
+                { "key": "type",        "value": "ROOM",    "disabled": true },
+                { "key": "minCapacity", "value": "10",      "disabled": true },
+                { "key": "building",    "value": "Block A",  "disabled": true },
+                { "key": "status",      "value": "AVAILABLE","disabled": true },
+                { "key": "tag",         "value": "wifi",     "disabled": true },
+                { "key": "search",      "value": "lab",      "disabled": true },
+                { "key": "page",        "value": "0" },
+                { "key": "size",        "value": "10" },
+                { "key": "sortBy",      "value": "resourceId" },
+                { "key": "sortDir",     "value": "asc" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resource by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resources/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Resource (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceCode\": \"LAB-101\",\n  \"resourceName\": \"Computer Lab 101 (Updated)\",\n  \"resourceType\": \"LAB\",\n  \"equipmentSubtype\": null,\n  \"capacity\": 35,\n  \"building\": \"Building A\",\n  \"floor\": \"1\",\n  \"roomOrAreaIdentifier\": \"101\",\n  \"fullLocationDescription\": \"Ground floor, Building A\",\n  \"defaultAvailableFrom\": \"08:00:00\",\n  \"defaultAvailableTo\": \"20:00:00\",\n  \"workingDays\": \"MON,TUE,WED,THU,FRI\",\n  \"status\": \"ACTIVE\",\n  \"statusNotes\": null,\n  \"description\": \"Updated description\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resources/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Resource (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/resources/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Tag to Resource (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/tags/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1","tags","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Resource Tags",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/tags", "host": ["{{baseUrl}}"], "path": ["api","resources","1","tags"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Tag from Resource (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/tags/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1","tags","1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Resource Tags",
+      "item": [
+        {
+          "name": "List All Tags",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resource-tags", "host": ["{{baseUrl}}"], "path": ["api","resource-tags"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tag by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resource-tags/1", "host": ["{{baseUrl}}"], "path": ["api","resource-tags","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tag",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagName\": \"WiFi\",\n  \"tagColor\": \"#3498db\",\n  \"description\": \"Has WiFi access\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resource-tags", "host": ["{{baseUrl}}"], "path": ["api","resource-tags"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tag",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tagName\": \"WiFi (Updated)\",\n  \"tagColor\": \"#2980b9\",\n  \"description\": \"Has high-speed WiFi\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resource-tags/1", "host": ["{{baseUrl}}"], "path": ["api","resource-tags","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tag",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/resource-tags/1", "host": ["{{baseUrl}}"], "path": ["api","resource-tags","1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Resource Status Schedules",
+      "item": [
+        {
+          "name": "Create Status Schedule",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduleDate\": \"2026-05-01\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"scheduledStatus\": \"MAINTENANCE\",\n  \"reasonNote\": \"Monthly maintenance\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resources/1/status-schedules", "host": ["{{baseUrl}}"], "path": ["api","resources","1","status-schedules"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Status Schedules for Resource",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/status-schedules", "host": ["{{baseUrl}}"], "path": ["api","resources","1","status-schedules"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Status Schedule by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/status-schedules/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1","status-schedules","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Status Schedule",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scheduleDate\": \"2026-05-01\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"14:00:00\",\n  \"scheduledStatus\": \"MAINTENANCE\",\n  \"reasonNote\": \"Extended maintenance window\",\n  \"isActive\": true\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/resources/1/status-schedules/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1","status-schedules","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Status Schedule",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/resources/1/status-schedules/1", "host": ["{{baseUrl}}"], "path": ["api","resources","1","status-schedules","1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "DB Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/bookings/test-db", "host": ["{{baseUrl}}"], "path": ["api","bookings","test-db"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"userEmail\": \"student@sliit.lk\",\n  \"userName\": \"John Doe\",\n  \"bookingDate\": \"2026-05-10\",\n  \"startTime\": \"09:00:00\",\n  \"endTime\": \"11:00:00\",\n  \"purpose\": \"Group project meeting\",\n  \"expectedCount\": 5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings", "host": ["{{baseUrl}}"], "path": ["api","bookings"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Bookings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings?page=0&size=10&sortBy=bookingId&sortDir=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","bookings"],
+              "query": [
+                { "key": "resourceId",  "value": "1",           "disabled": true },
+                { "key": "status",      "value": "PENDING",     "disabled": true },
+                { "key": "userEmail",   "value": "test@sliit.lk","disabled": true },
+                { "key": "dateFrom",    "value": "2026-05-01",  "disabled": true },
+                { "key": "dateTo",      "value": "2026-05-31",  "disabled": true },
+                { "key": "search",      "value": "lab",         "disabled": true },
+                { "key": "page",        "value": "0" },
+                { "key": "size",        "value": "10" },
+                { "key": "sortBy",      "value": "bookingId" },
+                { "key": "sortDir",     "value": "desc" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/bookings/1", "host": ["{{baseUrl}}"], "path": ["api","bookings","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Booking",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"userEmail\": \"student@sliit.lk\",\n  \"userName\": \"John Doe\",\n  \"bookingDate\": \"2026-05-12\",\n  \"startTime\": \"10:00:00\",\n  \"endTime\": \"12:00:00\",\n  \"purpose\": \"Updated: Group project meeting\",\n  \"expectedCount\": 8\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings/1", "host": ["{{baseUrl}}"], "path": ["api","bookings","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Booking",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/bookings/1", "host": ["{{baseUrl}}"], "path": ["api","bookings","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Review Booking - Approve (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": true,\n  \"adminRemark\": \"Approved for use\",\n  \"reviewerEmail\": \"admin@sliit.lk\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings/1/review", "host": ["{{baseUrl}}"], "path": ["api","bookings","1","review"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Review Booking - Reject (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approved\": false,\n  \"adminRemark\": \"Resource not available on that date\",\n  \"reviewerEmail\": \"admin@sliit.lk\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/bookings/1/review", "host": ["{{baseUrl}}"], "path": ["api","bookings","1","review"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/1/cancel?userEmail=student@sliit.lk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","bookings","1","cancel"],
+              "query": [{ "key": "userEmail", "value": "student@sliit.lk" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Booking Conflicts",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/bookings/conflicts?resourceId=1&date=2026-05-10&startTime=09:00:00&endTime=11:00:00",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","bookings","conflicts"],
+              "query": [
+                { "key": "resourceId", "value": "1" },
+                { "key": "date",       "value": "2026-05-10" },
+                { "key": "startTime",  "value": "09:00:00" },
+                { "key": "endTime",    "value": "11:00:00" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Tickets",
+      "item": [
+        {
+          "name": "DB Health Check",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/test-db", "host": ["{{baseUrl}}"], "path": ["api","tickets","test-db"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"locationDesc\": \"Computer Lab 101, Building A\",\n  \"category\": \"HARDWARE\",\n  \"title\": \"Projector not working\",\n  \"description\": \"The projector in Lab 101 has been non-functional since this morning. No display output.\",\n  \"priority\": \"HIGH\",\n  \"reporterEmail\": \"student@sliit.lk\",\n  \"reporterName\": \"John Doe\",\n  \"contactPhone\": \"0771234567\",\n  \"contactMethod\": \"EMAIL\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets", "host": ["{{baseUrl}}"], "path": ["api","tickets"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Tickets",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets?page=0&size=10&sortBy=ticketId&sortDir=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","tickets"],
+              "query": [
+                { "key": "resourceId",      "value": "1",               "disabled": true },
+                { "key": "status",          "value": "OPEN",            "disabled": true },
+                { "key": "priority",        "value": "HIGH",            "disabled": true },
+                { "key": "category",        "value": "HARDWARE",        "disabled": true },
+                { "key": "reporterEmail",   "value": "test@sliit.lk",   "disabled": true },
+                { "key": "assignedToEmail", "value": "tech@sliit.lk",   "disabled": true },
+                { "key": "search",          "value": "projector",       "disabled": true },
+                { "key": "page",            "value": "0" },
+                { "key": "size",            "value": "10" },
+                { "key": "sortBy",          "value": "ticketId" },
+                { "key": "sortDir",         "value": "desc" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Ticket by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1", "host": ["{{baseUrl}}"], "path": ["api","tickets","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Ticket",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceId\": 1,\n  \"locationDesc\": \"Computer Lab 101, Building A\",\n  \"category\": \"HARDWARE\",\n  \"title\": \"Projector not working - updated\",\n  \"description\": \"The projector has been non-functional. Also affects the second unit.\",\n  \"priority\": \"CRITICAL\",\n  \"reporterEmail\": \"student@sliit.lk\",\n  \"reporterName\": \"John Doe\",\n  \"contactPhone\": \"0771234567\",\n  \"contactMethod\": \"PHONE\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1", "host": ["{{baseUrl}}"], "path": ["api","tickets","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Ticket",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1", "host": ["{{baseUrl}}"], "path": ["api","tickets","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Ticket (ADMIN / TECHNICIAN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assignedToEmail\": \"technician@sliit.lk\",\n  \"assignedToName\": \"Jane Tech\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/assign", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","assign"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Ticket (ADMIN / TECHNICIAN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolutionNotes\": \"Replaced the projector lamp. Unit is now functioning correctly.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/resolve", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","resolve"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Close Ticket (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/close", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","close"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Ticket (ADMIN)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectReason\": \"Duplicate ticket - see ticket #5 for this issue.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/reject", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","reject"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Pattern Alert for Ticket",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/pattern-alert", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","pattern-alert"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Attachment to Ticket",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [{ "key": "file", "type": "file", "src": "" }]
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/attachments", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","attachments"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Ticket Attachments",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/attachments", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","attachments"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Attachment",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/attachments/1", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","attachments","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Attachment",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/attachments/1", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","attachments","1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Ticket Comments",
+      "item": [
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"authorEmail\": \"student@sliit.lk\",\n  \"authorName\": \"John Doe\",\n  \"commentText\": \"Still happening as of this morning.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/comments", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","comments"] }
+          },
+          "response": []
+        },
+        {
+          "name": "List Comments for Ticket",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/tickets/1/comments", "host": ["{{baseUrl}}"], "path": ["api","tickets","1","comments"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Comment",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "text/plain" }],
+            "body": {
+              "mode": "raw",
+              "raw": "Corrected: Issue started yesterday afternoon, not this morning."
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1/comments/1?authorEmail=student@sliit.lk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","tickets","1","comments","1"],
+              "query": [{ "key": "authorEmail", "value": "student@sliit.lk" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Comment",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/tickets/1/comments/1?requesterEmail=student@sliit.lk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api","tickets","1","comments","1"],
+              "query": [{ "key": "requesterEmail", "value": "student@sliit.lk" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/notifications", "host": ["{{baseUrl}}"], "path": ["api","notifications"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/notifications/count", "host": ["{{baseUrl}}"], "path": ["api","notifications","count"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/notifications/1/read", "host": ["{{baseUrl}}"], "path": ["api","notifications","1","read"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark All Notifications as Read",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/notifications/read-all", "host": ["{{baseUrl}}"], "path": ["api","notifications","read-all"] }
+          },
+          "response": []
+        }
+      ]
+    }
+
+  ]
+}
