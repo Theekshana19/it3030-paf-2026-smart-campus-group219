@@ -24,6 +24,7 @@ import lk.sliit.smartcampus.mapper.BookingMapper;
 import lk.sliit.smartcampus.repository.BookingRepository;
 import lk.sliit.smartcampus.repository.ResourceRepository;
 import lk.sliit.smartcampus.service.BookingService;
+import lk.sliit.smartcampus.service.NotificationService;
 import lk.sliit.smartcampus.util.BookingSpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,14 +49,17 @@ public class BookingServiceImpl implements BookingService {
   private final BookingRepository bookingRepository;
   private final ResourceRepository resourceRepository;
   private final BookingMapper bookingMapper;
+  private final NotificationService notificationService;
 
   public BookingServiceImpl(
       BookingRepository bookingRepository,
       ResourceRepository resourceRepository,
-      BookingMapper bookingMapper) {
+      BookingMapper bookingMapper,
+      NotificationService notificationService) {
     this.bookingRepository = bookingRepository;
     this.resourceRepository = resourceRepository;
     this.bookingMapper = bookingMapper;
+    this.notificationService = notificationService;
   }
 
   @Override
@@ -217,6 +221,7 @@ public class BookingServiceImpl implements BookingService {
     entity.setUpdatedAt(now);
 
     Booking saved = bookingRepository.save(entity);
+    notificationService.notifyBookingUpdate(saved);
     return bookingMapper.toResponse(saved);
   }
 

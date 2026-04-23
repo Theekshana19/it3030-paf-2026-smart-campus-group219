@@ -22,6 +22,7 @@ import lk.sliit.smartcampus.exception.TicketNotFoundException;
 import lk.sliit.smartcampus.mapper.TicketMapper;
 import lk.sliit.smartcampus.repository.ResourceRepository;
 import lk.sliit.smartcampus.repository.TicketRepository;
+import lk.sliit.smartcampus.service.NotificationService;
 import lk.sliit.smartcampus.service.TicketService;
 import lk.sliit.smartcampus.util.TicketSpecifications;
 import org.springframework.data.domain.Page;
@@ -49,14 +50,17 @@ public class TicketServiceImpl implements TicketService {
   private final TicketRepository ticketRepository;
   private final ResourceRepository resourceRepository;
   private final TicketMapper ticketMapper;
+  private final NotificationService notificationService;
 
   public TicketServiceImpl(
       TicketRepository ticketRepository,
       ResourceRepository resourceRepository,
-      TicketMapper ticketMapper) {
+      TicketMapper ticketMapper,
+      NotificationService notificationService) {
     this.ticketRepository = ticketRepository;
     this.resourceRepository = resourceRepository;
     this.ticketMapper = ticketMapper;
+    this.notificationService = notificationService;
   }
 
   // this method creates a new incident ticket
@@ -174,6 +178,7 @@ public class TicketServiceImpl implements TicketService {
     entity.setUpdatedAt(now);
 
     Ticket saved = ticketRepository.save(entity);
+    notificationService.notifyTicketUpdate(saved);
     return ticketMapper.toResponse(saved);
   }
 
@@ -195,6 +200,7 @@ public class TicketServiceImpl implements TicketService {
     entity.setUpdatedAt(now);
 
     Ticket saved = ticketRepository.save(entity);
+    notificationService.notifyTicketUpdate(saved);
     return ticketMapper.toResponse(saved);
   }
 
@@ -214,6 +220,7 @@ public class TicketServiceImpl implements TicketService {
     entity.setUpdatedAt(now);
 
     Ticket saved = ticketRepository.save(entity);
+    notificationService.notifyTicketUpdate(saved);
     return ticketMapper.toResponse(saved);
   }
 
@@ -232,6 +239,7 @@ public class TicketServiceImpl implements TicketService {
     entity.setUpdatedAt(LocalDateTime.now());
 
     Ticket saved = ticketRepository.save(entity);
+    notificationService.notifyTicketUpdate(saved);
     return ticketMapper.toResponse(saved);
   }
 

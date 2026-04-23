@@ -12,6 +12,7 @@ import lk.sliit.smartcampus.exception.TicketNotFoundException;
 import lk.sliit.smartcampus.mapper.TicketCommentMapper;
 import lk.sliit.smartcampus.repository.TicketCommentRepository;
 import lk.sliit.smartcampus.repository.TicketRepository;
+import lk.sliit.smartcampus.service.NotificationService;
 import lk.sliit.smartcampus.service.TicketCommentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +27,17 @@ public class TicketCommentServiceImpl implements TicketCommentService {
   private final TicketCommentRepository commentRepository;
   private final TicketRepository ticketRepository;
   private final TicketCommentMapper commentMapper;
+  private final NotificationService notificationService;
 
   public TicketCommentServiceImpl(
       TicketCommentRepository commentRepository,
       TicketRepository ticketRepository,
-      TicketCommentMapper commentMapper) {
+      TicketCommentMapper commentMapper,
+      NotificationService notificationService) {
     this.commentRepository = commentRepository;
     this.ticketRepository = ticketRepository;
     this.commentMapper = commentMapper;
+    this.notificationService = notificationService;
   }
 
   // any user or staff member can add a comment to a ticket
@@ -55,6 +59,7 @@ public class TicketCommentServiceImpl implements TicketCommentService {
         .build();
 
     TicketComment saved = commentRepository.save(comment);
+    notificationService.notifyNewComment(ticket, saved);
     return commentMapper.toResponse(saved);
   }
 
