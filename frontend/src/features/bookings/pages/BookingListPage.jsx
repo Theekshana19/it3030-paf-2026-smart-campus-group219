@@ -44,7 +44,8 @@ export default function BookingListPage() {
   );
 
   const hasActiveFilters = filters.status || filters.dateFrom || filters.dateTo || filters.userEmail;
-  const activeFilterCount = [filters.status, filters.dateFrom, filters.dateTo, filters.userEmail].filter(Boolean).length;
+  const showClearButton = hasActiveFilters || !!searchInput;
+  const activeFilterCount = [filters.status, filters.dateFrom, filters.dateTo, filters.userEmail, searchInput].filter(Boolean).length;
 
   return (
     <div className="p-6 md:p-8 w-full space-y-5">
@@ -133,8 +134,8 @@ export default function BookingListPage() {
             />
           </div>
 
-          {/* clear button — shown only when filters active */}
-          {hasActiveFilters && (
+          {/* clear button — shown when any filter or search is active */}
+          {showClearButton && (
             <button
               type="button"
               onClick={clearFilters}

@@ -30,9 +30,9 @@ export default function BookingTable({ items, sortBy, sortDir, toggleSort, onDel
               {headers.map((h) => (
                 <th
                   key={h.key}
-                  onClick={h.key !== 'actions' ? () => toggleSort(h.key) : undefined}
+                  onClick={h.key !== 'actions' && h.key !== 'resourceName' ? () => toggleSort(h.key) : undefined}
                   className={`px-4 py-3.5 text-left text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label select-none ${
-                    h.key !== 'actions' ? 'cursor-pointer hover:text-primary transition-colors' : ''
+                    h.key !== 'actions' && h.key !== 'resourceName' ? 'cursor-pointer hover:text-primary transition-colors' : ''
                   }`}
                 >
                   <span className="flex items-center gap-1">
@@ -42,7 +42,7 @@ export default function BookingTable({ items, sortBy, sortDir, toggleSort, onDel
                         name={sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'}
                         className="text-xs text-primary"
                       />
-                    ) : h.key !== 'actions' ? (
+                    ) : h.key !== 'actions' && h.key !== 'resourceName' ? (
                       <Icon name="unfold_more" className="text-xs text-on-surface-variant/30" />
                     ) : null}
                   </span>

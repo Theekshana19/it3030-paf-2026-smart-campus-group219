@@ -27,4 +27,3 @@ IF NOT EXISTS (
     CREATE INDEX IX_resources_type_building
         ON dbo.resources(resource_type, building);
 GO
-

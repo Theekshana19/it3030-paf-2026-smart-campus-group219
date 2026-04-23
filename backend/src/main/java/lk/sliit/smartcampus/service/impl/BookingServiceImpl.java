@@ -293,10 +293,10 @@ public class BookingServiceImpl implements BookingService {
         .toList();
   }
 
-  // generate unique booking ref like BK-20260410-001
+  // generate unique booking ref like BK-20260410-001, sequence resets each day
   private String generateBookingRef(LocalDate date) {
     String prefix = "BK-" + date.format(REF_DATE_FMT) + "-";
-    long count = bookingRepository.count();
+    long count = bookingRepository.countByBookingDate(date);
     String ref;
     do {
       count++;

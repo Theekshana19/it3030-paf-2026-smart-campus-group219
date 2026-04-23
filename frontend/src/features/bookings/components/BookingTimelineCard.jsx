@@ -34,6 +34,7 @@ export default function BookingTimelineCard({ resourceId, bookingDate, currentBo
   const startHour = 8;
   const endHour = 20;
   const totalMinutes = (endHour - startHour) * 60;
+  const currentIsVisible = dayBookings.some((b) => b.bookingId === currentBookingId);
 
   const getPosition = (timeStr) => {
     const [h, m] = timeStr.slice(0, 5).split(':').map(Number);
@@ -77,11 +78,13 @@ export default function BookingTimelineCard({ resourceId, bookingDate, currentBo
       </div>
 
       <div className="flex items-center gap-4 mt-2 text-xs text-on-surface-variant font-body">
+        {currentIsVisible && (
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded bg-primary inline-block" /> Your booking
+          </span>
+        )}
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-primary inline-block" /> Your booking
-        </span>
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-primary/30 inline-block" /> Other bookings
+          <span className="w-3 h-3 rounded bg-primary/30 inline-block" /> {currentIsVisible ? 'Other bookings' : 'Approved bookings'}
         </span>
       </div>
     </div>

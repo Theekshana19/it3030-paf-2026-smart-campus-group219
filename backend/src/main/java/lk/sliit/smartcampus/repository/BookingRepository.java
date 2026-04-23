@@ -33,6 +33,9 @@ public interface BookingRepository
   long countByResource_ResourceIdAndBookingDateAndBookingStatus(
       Long resourceId, LocalDate bookingDate, BookingStatus status);
 
+  // count all bookings for a given date — used for per-day ref sequence
+  long countByBookingDate(LocalDate bookingDate);
+
   // find all bookings by user email
   List<Booking> findByUserEmailIgnoreCase(String userEmail);
 }
