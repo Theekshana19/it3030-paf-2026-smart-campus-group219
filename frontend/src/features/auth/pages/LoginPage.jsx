@@ -1,50 +1,45 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
-import GoogleSignInPanel from '../components/GoogleSignInPanel.jsx';
-import { loginEmailSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 
-const inputClass =
-  'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
-const labelClass =
-  'block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5';
-
-function fieldClass(hasError) {
-  return [inputClass, hasError ? 'border-red-500 ring-2 ring-red-500/15' : ''].filter(Boolean).join(' ');
-}
-
 export default function LoginPage() {
-  const { user, loginWithCredentials } = useAuth();
+  const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  // Default to Google (OAuth 2.0) tab so sign-in or setup steps are visible first
   const [mode, setMode] = useState('google');
-
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(loginEmailSchema),
-    defaultValues: { email: '', password: '' },
-    mode: 'onTouched',
-  });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) navigate('/', { replace: true });
   }, [user, navigate]);
 
-  const onEmailLogin = handleSubmit(async ({ email, password }) => {
+  const handleGoogleSuccess = async ({ credential }) => {
+    try {
+      await login(credential);
+    } catch (err) {
+      toast.error(getErrorMessage(err) || 'Google Sign-In failed. Please try again.');
+    }
+  };
+
+  const handleEmailLogin = async (e) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    setSubmitting(true);
     try {
       await loginWithCredentials({ email, password });
     } catch (err) {
       toast.error(getErrorMessage(err) || 'Invalid email or password.');
+    } finally {
+      setSubmitting(false);
     }
-  });
+  };
+
+  const inputClass =
+    'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
@@ -62,11 +57,6 @@ export default function LoginPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Welcome back</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Sign in to manage campus resources</p>
 
-          <p className="text-center text-xs text-on-surface-variant mb-4">
-            Google Sign-In uses <span className="font-semibold text-on-surface">OAuth 2.0</span> (Google Identity
-            Services), or use email and password.
-          </p>
-
           <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
             <button
               type="button"
@@ -77,14 +67,11 @@ export default function LoginPage() {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Google (OAuth 2.0)
+              Google
             </button>
             <button
               type="button"
-              onClick={() => {
-                setMode('email');
-                reset();
-              }}
+              onClick={() => setMode('email')}
               className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                 mode === 'email'
                   ? 'bg-white shadow-sm text-on-surface'
@@ -96,57 +83,60 @@ export default function LoginPage() {
           </div>
 
           {mode === 'google' ? (
-            <div className="space-y-3">
-              <GoogleSignInPanel successMessage="Welcome back!" />
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Google Sign-In failed. Please try again.')}
+                theme="outline"
+                size="large"
+                shape="rectangular"
+                width="280"
+              />
             </div>
           ) : (
-            <form onSubmit={onEmailLogin} className="space-y-4" noValidate>
+            <form onSubmit={handleEmailLogin} className="space-y-4" noValidate>
               <div>
-                <label htmlFor="login-email" className={labelClass}>
+                <label
+                  htmlFor="login-email"
+                  className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+                >
                   Email
                 </label>
                 <input
                   id="login-email"
                   type="email"
-                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
                   placeholder="you@sliit.lk"
-                  className={fieldClass(Boolean(errors.email))}
-                  aria-invalid={errors.email ? 'true' : 'false'}
-                  aria-describedby={errors.email ? 'login-email-error' : undefined}
-                  {...register('email')}
+                  autoComplete="email"
+                  required
                 />
-                {errors.email?.message ? (
-                  <p id="login-email-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                    {errors.email.message}
-                  </p>
-                ) : null}
               </div>
               <div>
-                <label htmlFor="login-password" className={labelClass}>
+                <label
+                  htmlFor="login-password"
+                  className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+                >
                   Password
                 </label>
                 <input
                   id="login-password"
                   type="password"
-                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={inputClass}
                   placeholder="••••••••"
-                  className={fieldClass(Boolean(errors.password))}
-                  aria-invalid={errors.password ? 'true' : 'false'}
-                  aria-describedby={errors.password ? 'login-password-error' : undefined}
-                  {...register('password')}
+                  autoComplete="current-password"
+                  required
                 />
-                {errors.password?.message ? (
-                  <p id="login-password-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                    {errors.password.message}
-                  </p>
-                ) : null}
               </div>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={submitting || !email || !password}
                 className="w-full py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm shadow hover:opacity-90 transition-all disabled:opacity-50"
               >
-                {isSubmitting ? 'Signing in…' : 'Sign In'}
+                {submitting ? 'Signing in…' : 'Sign In'}
               </button>
             </form>
           )}

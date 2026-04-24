@@ -1,56 +1,45 @@
 import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
-import GoogleSignInPanel from '../components/GoogleSignInPanel.jsx';
-import { registerSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 
-const inputClass =
-  'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
-const labelClass =
-  'block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5';
-
-function fieldClass(hasError) {
-  return [inputClass, hasError ? 'border-red-500 ring-2 ring-red-500/15' : ''].filter(Boolean).join(' ');
-}
-
-const defaultValues = {
-  displayName: '',
-  email: '',
-  password: '',
-  confirmPassword: '',
-};
-
 export default function RegisterPage() {
-  const { user, register: registerUser } = useAuth();
+  const { user, register } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState('google');
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm({
-    resolver: zodResolver(registerSchema),
-    defaultValues,
-    mode: 'onTouched',
-  });
+  const [displayName, setDisplayName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) navigate('/', { replace: true });
   }, [user, navigate]);
 
-  const onSubmit = handleSubmit(async ({ displayName, email, password }) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== confirm) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters.');
+      return;
+    }
+    setSubmitting(true);
     try {
-      await registerUser({ displayName, email, password });
+      await register({ displayName, email, password });
       toast.success('Account created! Welcome to SmartCampus.');
     } catch (err) {
       toast.error(getErrorMessage(err) || 'Registration failed. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
-  });
+  };
+
+  const inputClass =
+    'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
 
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
@@ -68,145 +57,91 @@ export default function RegisterPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Create account</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Register to access the campus portal</p>
 
-          <p className="text-center text-xs text-on-surface-variant mb-4">
-            Sign up with <span className="font-semibold text-on-surface">Google (OAuth 2.0)</span> or register with
-            email and password.
-          </p>
-
-          <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => setMode('google')}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                mode === 'google'
-                  ? 'bg-white shadow-sm text-on-surface'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Google (OAuth 2.0)
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('email')}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                mode === 'email'
-                  ? 'bg-white shadow-sm text-on-surface'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Email
-            </button>
-          </div>
-
-          {mode === 'google' ? (
-            <div className="space-y-3">
-              <GoogleSignInPanel
-                title="Sign up with Google"
-                successMessage="Welcome to SmartCampus! Signed in with Google."
-              />
-            </div>
-          ) : null}
-
-          {mode === 'email' ? (
-          <form onSubmit={onSubmit} className="space-y-4" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label htmlFor="reg-name" className={labelClass}>
+              <label
+                htmlFor="reg-name"
+                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+              >
                 Full Name
               </label>
               <input
                 id="reg-name"
                 type="text"
-                autoComplete="name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className={inputClass}
                 placeholder="e.g. John Doe"
-                className={fieldClass(Boolean(errors.displayName))}
-                aria-invalid={errors.displayName ? 'true' : 'false'}
-                aria-describedby={errors.displayName ? 'reg-name-error' : undefined}
-                {...register('displayName')}
+                autoComplete="name"
+                required
               />
-              {errors.displayName?.message ? (
-                <p id="reg-name-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                  {errors.displayName.message}
-                </p>
-              ) : null}
             </div>
 
             <div>
-              <label htmlFor="reg-email" className={labelClass}>
+              <label
+                htmlFor="reg-email"
+                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+              >
                 Email
               </label>
               <input
                 id="reg-email"
                 type="email"
-                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
                 placeholder="you@sliit.lk"
-                className={fieldClass(Boolean(errors.email))}
-                aria-invalid={errors.email ? 'true' : 'false'}
-                aria-describedby={errors.email ? 'reg-email-error' : undefined}
-                {...register('email')}
+                autoComplete="email"
+                required
               />
-              {errors.email?.message ? (
-                <p id="reg-email-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                  {errors.email.message}
-                </p>
-              ) : null}
             </div>
 
             <div>
-              <label htmlFor="reg-password" className={labelClass}>
+              <label
+                htmlFor="reg-password"
+                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+              >
                 Password
               </label>
               <input
                 id="reg-password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={inputClass}
+                placeholder="Min. 6 characters"
                 autoComplete="new-password"
-                placeholder="6–100 characters"
-                className={fieldClass(Boolean(errors.password))}
-                aria-invalid={errors.password ? 'true' : 'false'}
-                aria-describedby={
-                  errors.password ? 'reg-password-hint reg-password-error' : 'reg-password-hint'
-                }
-                {...register('password')}
+                required
               />
-              <p id="reg-password-hint" className="mt-1 text-on-surface-variant text-xs">
-                Use at least 6 characters (matches server rules).
-              </p>
-              {errors.password?.message ? (
-                <p id="reg-password-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                  {errors.password.message}
-                </p>
-              ) : null}
             </div>
 
             <div>
-              <label htmlFor="reg-confirm" className={labelClass}>
+              <label
+                htmlFor="reg-confirm"
+                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
+              >
                 Confirm Password
               </label>
               <input
                 id="reg-confirm"
                 type="password"
-                autoComplete="new-password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                className={inputClass}
                 placeholder="Re-enter password"
-                className={fieldClass(Boolean(errors.confirmPassword))}
-                aria-invalid={errors.confirmPassword ? 'true' : 'false'}
-                aria-describedby={errors.confirmPassword ? 'reg-confirm-error' : undefined}
-                {...register('confirmPassword')}
+                autoComplete="new-password"
+                required
               />
-              {errors.confirmPassword?.message ? (
-                <p id="reg-confirm-error" className="mt-1.5 text-error text-xs font-medium" role="alert">
-                  {errors.confirmPassword.message}
-                </p>
-              ) : null}
             </div>
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={submitting || !displayName || !email || !password || !confirm}
               className="w-full py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm shadow hover:opacity-90 transition-all disabled:opacity-50"
             >
-              {isSubmitting ? 'Creating account…' : 'Create Account'}
+              {submitting ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
-          ) : null}
 
           <p className="mt-6 text-center text-xs text-on-surface-variant">
             Already have an account?{' '}
