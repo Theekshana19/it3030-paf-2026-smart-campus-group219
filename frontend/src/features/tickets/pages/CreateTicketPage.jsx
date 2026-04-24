@@ -8,6 +8,7 @@ import * as ticketsApi from '../api/ticketsApi.js';
 import * as resourcesApi from '../../resources/api/resourcesApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 import { successAlert } from '../../../utils/sweetAlerts.js';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 import { TICKET_CATEGORY_OPTIONS, TICKET_PRIORITY_OPTIONS, CONTACT_METHOD_OPTIONS } from '../types/ticket.types.js';
 import Icon from '../../../components/common/Icon.jsx';
 
@@ -31,15 +32,24 @@ const defaultValues = {
 // the form has 4 sections: issue info, location, description, and contact
 export default function CreateTicketPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [resources, setResources] = useState([]);
 
   const {
-    register, handleSubmit, formState: { errors, isSubmitting },
+    register, handleSubmit, setValue, formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(ticketSchema),
     defaultValues,
     mode: 'onTouched',
   });
+
+  useEffect(() => {
+    if (!user?.email) return;
+    setValue('reporterEmail', user.email, { shouldValidate: true });
+    if (user.displayName?.trim()) {
+      setValue('reporterName', user.displayName.trim(), { shouldValidate: true });
+    }
+  }, [user?.email, user?.displayName, setValue]);
 
   // load resources for the optional resource dropdown
   useEffect(() => {

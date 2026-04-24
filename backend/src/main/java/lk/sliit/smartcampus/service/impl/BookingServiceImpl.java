@@ -240,6 +240,7 @@ public class BookingServiceImpl implements BookingService {
     entity.setUpdatedAt(LocalDateTime.now());
 
     Booking saved = bookingRepository.save(entity);
+    notificationService.notifyBookingUpdate(saved);
     return bookingMapper.toResponse(saved);
   }
 

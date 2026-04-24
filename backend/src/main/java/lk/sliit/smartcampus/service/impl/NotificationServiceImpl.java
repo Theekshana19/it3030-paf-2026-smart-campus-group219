@@ -94,11 +94,25 @@ public class NotificationServiceImpl implements NotificationService {
         String remark = booking.getAdminRemark() != null ? booking.getAdminRemark() : "No reason provided";
         message = "Your booking " + booking.getBookingRef()
             + " was rejected. Reason: " + remark;
+      } else if (booking.getBookingStatus() == BookingStatus.CANCELLED) {
+        title = "Booking Cancelled";
+        message = "Your booking " + booking.getBookingRef()
+            + " for " + booking.getResource().getResourceName() + " has been cancelled.";
       } else {
         return;
       }
       saveNotification(user, NotificationType.BOOKING, title, message);
     });
+  }
+
+  @Override
+  public void notifyTicketCreated(Ticket ticket) {
+    userRepository.findByEmailIgnoreCase(ticket.getReporterEmail()).ifPresent(user ->
+        saveNotification(
+            user,
+            NotificationType.TICKET,
+            "Ticket submitted",
+            "We received your ticket " + ticket.getTicketRef() + ". You will be notified of updates."));
   }
 
   @Override

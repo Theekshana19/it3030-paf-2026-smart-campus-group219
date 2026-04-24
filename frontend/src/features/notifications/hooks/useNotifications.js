@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 import {
   getUnreadCount,
   listNotifications,
@@ -9,14 +10,22 @@ import {
 const POLL_INTERVAL_MS = 30_000;
 
 export function useNotifications() {
+  const { user } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
 
-  // Poll unread count every 30 s
+  // Reset when logged out; poll unread count when authenticated
   useEffect(() => {
+    if (!user?.userId) {
+      setUnreadCount(0);
+      setNotifications([]);
+      setOpen(false);
+      return undefined;
+    }
+
     const fetchCount = () => {
       getUnreadCount()
         .then((data) => setUnreadCount(data.unreadCount ?? 0))
@@ -27,7 +36,7 @@ export function useNotifications() {
     fetchCount();
     const id = setInterval(fetchCount, POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, []);
+  }, [user?.userId]);
 
   // Close panel on outside click
   useEffect(() => {

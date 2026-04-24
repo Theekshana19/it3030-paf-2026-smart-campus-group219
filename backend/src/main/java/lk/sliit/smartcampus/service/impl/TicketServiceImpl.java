@@ -84,6 +84,7 @@ public class TicketServiceImpl implements TicketService {
     entity.setUpdatedAt(now);
 
     Ticket saved = ticketRepository.save(entity);
+    notificationService.notifyTicketCreated(saved);
     return ticketMapper.toResponse(saved);
   }
 

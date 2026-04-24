@@ -6,6 +6,7 @@ import lk.sliit.smartcampus.dto.response.NotificationResponse;
 import lk.sliit.smartcampus.service.NotificationService;
 import lk.sliit.smartcampus.util.SecurityUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +48,7 @@ public class NotificationController {
     return ResponseEntity.noContent().build();
   }
 
-  // DEBUG ENDPOINT - for testing purposes
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/debug/all")
   public Map<String, Object> debugAllNotifications() {
     List<NotificationResponse> allNotifications = notificationService

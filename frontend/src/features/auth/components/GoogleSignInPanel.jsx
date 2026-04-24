@@ -1,4 +1,5 @@
 import { GoogleLogin } from '@react-oauth/google';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 import { getErrorMessage } from '../../../services/httpClient.js';
@@ -13,12 +14,14 @@ export default function GoogleSignInPanel({
   successMessage = 'Signed in with Google.',
 }) {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const googleClientIdConfigured = isGoogleOAuthConfigured();
 
   const handleGoogleSuccess = async ({ credential }) => {
     try {
       await login(credential);
       toast.success(successMessage);
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       toast.error(getErrorMessage(err) || 'Google Sign-In failed. Please try again.');
     }

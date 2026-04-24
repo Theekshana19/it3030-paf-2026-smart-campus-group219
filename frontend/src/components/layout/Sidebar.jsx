@@ -56,6 +56,10 @@ function tagManagementNavActive({ pathname }) {
   return pathname === '/tag-management' || pathname === '/tags';
 }
 
+function teamNavActive({ pathname }) {
+  return pathname === '/team';
+}
+
 function dashboardNavActive({ pathname }) {
   return pathname === '/' || pathname === '/dashboard';
 }
@@ -91,7 +95,10 @@ export default function Sidebar() {
           isCustomActive={catalogueNavActive}
         />
         {isAdmin && (
-          <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
+          <>
+            <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
+            <NavItem to="/team" icon="group" label="Team & roles" isCustomActive={teamNavActive} />
+          </>
         )}
         <NavItem
           to="/bookings"

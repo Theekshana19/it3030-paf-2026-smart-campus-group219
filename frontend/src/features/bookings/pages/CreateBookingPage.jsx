@@ -8,6 +8,7 @@ import * as bookingsApi from '../api/bookingsApi.js';
 import * as resourcesApi from '../../resources/api/resourcesApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 import { successAlert } from '../../../utils/sweetAlerts.js';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 import BookingConflictBanner from '../components/BookingConflictBanner.jsx';
 import Icon from '../../../components/common/Icon.jsx';
 
@@ -28,6 +29,7 @@ const defaultValues = {
 // page to create a new booking
 export default function CreateBookingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [resources, setResources] = useState([]);
   const [conflicts, setConflicts] = useState([]);
   const [selectedResource, setSelectedResource] = useState(null);
@@ -41,6 +43,15 @@ export default function CreateBookingPage() {
   });
 
   const watched = watch();
+
+  // Prefill requester from signed-in user (email/password or Google OAuth)
+  useEffect(() => {
+    if (!user?.email) return;
+    setValue('userEmail', user.email, { shouldValidate: true });
+    if (user.displayName?.trim()) {
+      setValue('userName', user.displayName.trim(), { shouldValidate: true });
+    }
+  }, [user?.email, user?.displayName, setValue]);
 
   // load resources for the dropdown
   useEffect(() => {

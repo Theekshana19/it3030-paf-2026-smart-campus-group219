@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import * as commentsApi from '../api/commentsApi.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
+import { useAuth } from '../../auth/hooks/useAuth.js';
 import Icon from '../../../components/common/Icon.jsx';
 
 const inputClass = 'w-full bg-surface-container-low border-none rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary/20 transition-all font-body outline-none';
 
 export default function TicketCommentsCard({ ticketId }) {
+  const { user } = useAuth();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [authorName, setAuthorName] = useState('');
@@ -28,6 +30,12 @@ export default function TicketCommentsCard({ ticketId }) {
   useEffect(() => {
     loadComments();
   }, [loadComments]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    setAuthorEmail((prev) => (prev.trim() ? prev : user.email));
+    setAuthorName((prev) => (prev.trim() ? prev : (user.displayName ?? '').trim() || prev));
+  }, [user?.email, user?.displayName]);
 
   const handlePost = async () => {
     if (!newComment.trim() || !authorName.trim() || !authorEmail.trim()) {

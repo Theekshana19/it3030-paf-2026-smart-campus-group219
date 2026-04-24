@@ -20,5 +20,8 @@ public interface NotificationService {
 
   void notifyTicketUpdate(Ticket ticket);
 
+  /** In-app confirmation when a reporter submits a new ticket (Module D). */
+  void notifyTicketCreated(Ticket ticket);
+
   void notifyNewComment(Ticket ticket, TicketComment comment);
 }

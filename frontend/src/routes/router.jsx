@@ -19,6 +19,7 @@ import EditTicketPage from '../features/tickets/pages/EditTicketPage.jsx';
 import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
 import TagManagementPage from '../features/tags/pages/TagManagementPage.jsx';
 import DashboardPage from '../features/dashboard/pages/DashboardPage.jsx';
+import TeamRolesPage from '../features/users/pages/TeamRolesPage.jsx';
 
 function PlaceholderPage({ title }) {
   return (
@@ -61,6 +62,11 @@ export const router = createBrowserRouter([
                 path: 'resources/:resourceId/edit',
                 element: <EditResourcePage />,
                 handle: { crumb: 'Edit Resource' },
+              },
+              {
+                path: 'team',
+                element: <TeamRolesPage />,
+                handle: { crumb: 'Team & roles' },
               },
             ],
           },
