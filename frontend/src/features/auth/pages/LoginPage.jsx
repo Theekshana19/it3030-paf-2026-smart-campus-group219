@@ -4,10 +4,12 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 
+const googleClientIdConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim());
+
 export default function LoginPage() {
   const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState('google'); // 'google' | 'email'
+  const [mode, setMode] = useState(googleClientIdConfigured ? 'google' : 'email'); // 'google' | 'email'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -90,15 +92,27 @@ export default function LoginPage() {
           </div>
 
           {mode === 'google' ? (
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => toast.error('Google Sign-In failed. Please try again.')}
-                theme="outline"
-                size="large"
-                shape="rectangular"
-                width="280"
-              />
+            <div className="space-y-3">
+              {!googleClientIdConfigured ? (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900">
+                  Google Sign-In is not configured. Copy{' '}
+                  <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env.example</code> to{' '}
+                  <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code>, set{' '}
+                  <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to your Web
+                  client ID from Google Cloud Console, then restart <code className="text-xs">npm run dev</code>.
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error('Google Sign-In failed. Please try again.')}
+                    theme="outline"
+                    size="large"
+                    shape="rectangular"
+                    width="280"
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleEmailLogin} className="space-y-4" noValidate>

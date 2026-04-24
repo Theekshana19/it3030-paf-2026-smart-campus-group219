@@ -7,13 +7,21 @@ import { AuthProvider } from './features/auth/contexts/AuthContext.jsx';
 import { router } from './routes/router.jsx';
 import './index.css';
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || '';
+
+const appTree = (
+  <AuthProvider>
+    <RouterProvider router={router} />
+    <Toaster richColors position="top-right" closeButton />
+  </AuthProvider>
+);
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-        <Toaster richColors position="top-right" closeButton />
-      </AuthProvider>
-    </GoogleOAuthProvider>
+    {googleClientId ? (
+      <GoogleOAuthProvider clientId={googleClientId}>{appTree}</GoogleOAuthProvider>
+    ) : (
+      appTree
+    )}
   </StrictMode>
 );
