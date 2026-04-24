@@ -5,9 +5,10 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Toaster } from 'sonner';
 import { AuthProvider } from './features/auth/contexts/AuthContext.jsx';
 import { router } from './routes/router.jsx';
+import { getGoogleWebClientId, isGoogleOAuthConfigured } from './config/googleClient.js';
 import './index.css';
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || '';
+const googleClientId = isGoogleOAuthConfigured() ? getGoogleWebClientId() : '';
 
 const appTree = (
   <AuthProvider>

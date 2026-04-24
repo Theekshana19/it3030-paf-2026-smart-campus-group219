@@ -7,8 +7,9 @@ import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
 import { loginEmailSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
+import { isGoogleOAuthConfigured } from '../../../config/googleClient.js';
 
-const googleClientIdConfigured = Boolean(import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim());
+const googleClientIdConfigured = isGoogleOAuthConfigured();
 
 const inputClass =
   'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
@@ -22,7 +23,7 @@ function fieldClass(hasError) {
 export default function LoginPage() {
   const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState('google');
+  const [mode, setMode] = useState(googleClientIdConfigured ? 'google' : 'email');
 
   const {
     register,
@@ -42,8 +43,8 @@ export default function LoginPage() {
   const handleGoogleSuccess = async ({ credential }) => {
     try {
       await login(credential);
-    } catch {
-      toast.error('Google Sign-In failed. Please try again.');
+    } catch (err) {
+      toast.error(getErrorMessage(err) || 'Google Sign-In failed. Please try again.');
     }
   };
 
@@ -71,46 +72,75 @@ export default function LoginPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Welcome back</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Sign in to manage campus resources</p>
 
-          {googleClientIdConfigured ? (
-            <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
-              <button
-                type="button"
-                onClick={() => setMode('google')}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  mode === 'google'
-                    ? 'bg-white shadow-sm text-on-surface'
-                    : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                Google
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMode('email');
-                  reset();
-                }}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                  mode === 'email'
-                    ? 'bg-white shadow-sm text-on-surface'
-                    : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                Email
-              </button>
-            </div>
-          ) : null}
+          <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => setMode('google')}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                mode === 'google'
+                  ? 'bg-white shadow-sm text-on-surface'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              Google
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('email');
+                reset();
+              }}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                mode === 'email'
+                  ? 'bg-white shadow-sm text-on-surface'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              Email
+            </button>
+          </div>
 
-          {googleClientIdConfigured && mode === 'google' ? (
-            <div className="flex justify-center mb-2">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => toast.error('Google Sign-In failed. Please try again.')}
-                theme="outline"
-                size="large"
-                shape="rectangular"
-                width="280"
-              />
+          {mode === 'google' ? (
+            <div className="space-y-3">
+              {!googleClientIdConfigured ? (
+                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900 space-y-2">
+                  <p className="font-semibold">Enable Google Sign-In locally</p>
+                  <ol className="list-decimal list-inside space-y-1 text-amber-900/95">
+                    <li>
+                      Copy{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env.example</code> to{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code>.
+                    </li>
+                    <li>
+                      Set <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to your
+                      OAuth 2.0 <strong>Web client</strong> ID (ends in{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">.apps.googleusercontent.com</code>).
+                    </li>
+                    <li>
+                      In Google Cloud Console → Credentials → that client → <strong>Authorized JavaScript origins</strong>
+                      , add the exact Vite URL you use (e.g.{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:5173</code>
+                      — add <code className="text-xs">5174</code>/<code className="text-xs">5175</code> if needed).
+                    </li>
+                    <li>
+                      Set <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> to your API (e.g.{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:8080</code>), run the
+                      Spring Boot backend, then restart <code className="text-xs">npm run dev</code>.
+                    </li>
+                  </ol>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => toast.error('Google Sign-In failed. Please try again.')}
+                    theme="outline"
+                    size="large"
+                    shape="rectangular"
+                    width="280"
+                  />
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={onEmailLogin} className="space-y-4" noValidate>
