@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { clearAuth, getToken } from '../features/auth/utils/tokenStorage';
 
+// Empty / unset → same-origin `/api/...` so Vite dev proxy (vite.config.js) can reach Spring Boot
+const apiBase = String(import.meta.env.VITE_API_BASE_URL ?? '').trim();
 const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: apiBase.length > 0 ? apiBase : undefined,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -1,14 +1,20 @@
 /**
- * Web OAuth client IDs from Google Cloud end with `.apps.googleusercontent.com`.
- * The tracked `.env.example` placeholder must not enable GIS (would load with a bad client_id).
+ * Web OAuth client IDs from Google Cloud contain `*.googleusercontent.com`.
+ * Normalize Windows `.env` (CRLF, quotes) so the GIS button and provider stay in sync.
  */
 export function getGoogleWebClientId() {
-  return import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || '';
+  let v = String(import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '').trim();
+  v = v.replace(/\r/g, '');
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+    v = v.slice(1, -1).trim();
+  }
+  return v;
 }
 
 export function isGoogleOAuthConfigured() {
   const id = getGoogleWebClientId();
-  if (!id) return false;
+  if (!id || id.length < 15) return false;
   if (/your-client-id|placeholder|changeme/i.test(id)) return false;
-  return /\.apps\.googleusercontent\.com$/i.test(id);
+  // Lenient: some editors add trailing junk; web client IDs always contain this host fragment
+  return /\.googleusercontent\.com/i.test(id);
 }

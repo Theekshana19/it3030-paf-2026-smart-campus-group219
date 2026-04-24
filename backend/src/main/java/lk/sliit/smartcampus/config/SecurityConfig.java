@@ -54,12 +54,15 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration config = new CorsConfiguration();
-    // Vite may pick 5174/5175 if 5173 is taken; add production origins via env if needed later
+    // Vite dev: localhost and 127.0.0.1; extra ports if 5173 is busy
     config.setAllowedOrigins(
         List.of(
             "http://localhost:5173",
             "http://localhost:5174",
-            "http://localhost:5175"));
+            "http://localhost:5175",
+            "http://127.0.0.1:5173",
+            "http://127.0.0.1:5174",
+            "http://127.0.0.1:5175"));
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
     config.setAllowCredentials(true);

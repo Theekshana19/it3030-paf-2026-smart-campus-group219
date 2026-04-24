@@ -9,8 +9,6 @@ import { loginEmailSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 import { isGoogleOAuthConfigured } from '../../../config/googleClient.js';
 
-const googleClientIdConfigured = isGoogleOAuthConfigured();
-
 const inputClass =
   'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
 const labelClass =
@@ -23,7 +21,9 @@ function fieldClass(hasError) {
 export default function LoginPage() {
   const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState(googleClientIdConfigured ? 'google' : 'email');
+  const googleClientIdConfigured = isGoogleOAuthConfigured();
+  // Always start on Google tab so OAuth 2.0 sign-in (or setup steps) is visible first
+  const [mode, setMode] = useState('google');
 
   const {
     register,
@@ -72,6 +72,11 @@ export default function LoginPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Welcome back</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Sign in to manage campus resources</p>
 
+          <p className="text-center text-xs text-on-surface-variant mb-4">
+            Google Sign-In uses <span className="font-semibold text-on-surface">OAuth 2.0</span> (Google Identity
+            Services), or use email and password.
+          </p>
+
           <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
             <button
               type="button"
@@ -82,7 +87,7 @@ export default function LoginPage() {
                   : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              Google
+              Google (OAuth 2.0)
             </button>
             <button
               type="button"
@@ -123,22 +128,27 @@ export default function LoginPage() {
                       — add <code className="text-xs">5174</code>/<code className="text-xs">5175</code> if needed).
                     </li>
                     <li>
-                      Set <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> to your API (e.g.{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:8080</code>), run the
-                      Spring Boot backend, then restart <code className="text-xs">npm run dev</code>.
+                      Run the Spring Boot backend on port <strong>8080</strong> (Vite proxies{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">/api</code> there). Only set{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> if you are not
+                      using that proxy. Restart <code className="text-xs">npm run dev</code> after changing{' '}
+                      <code className="text-xs">.env</code>.
                     </li>
                   </ol>
                 </div>
               ) : (
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => toast.error('Google Sign-In failed. Please try again.')}
-                    theme="outline"
-                    size="large"
-                    shape="rectangular"
-                    width="280"
-                  />
+                <div className="flex w-full flex-col items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low/30 px-4 py-6">
+                  <p className="text-center text-xs font-medium text-on-surface-variant">Continue with Google</p>
+                  <div className="flex min-h-[44px] w-full max-w-[320px] justify-center items-center">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => toast.error('Google Sign-In failed. Please try again.')}
+                      theme="outline"
+                      size="large"
+                      shape="rectangular"
+                      width="280"
+                    />
+                  </div>
                 </div>
               )}
             </div>
