@@ -34,4 +34,9 @@ if (process.platform === 'win32') {
 }
 
 console.log('Opened Google Cloud Credentials in your browser.');
-console.log('Create or open a Web application OAuth client, copy the Client ID, set VITE_GOOGLE_CLIENT_ID in frontend/.env, then: npm run dev');
+console.log(
+  'Create a Web application OAuth client, copy the Client ID into frontend/.env on THIS machine as VITE_GOOGLE_CLIENT_ID=... then: npm run dev'
+);
+console.log(
+  'Note: Google Cloud Shell cannot edit your PC .env — use Cloud Shell only for gcloud/console; paste the Client ID locally.'
+);

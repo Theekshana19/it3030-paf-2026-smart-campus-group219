@@ -33,6 +33,12 @@ export default function GoogleSignInPanel({
           <code className="bg-amber-100 px-1 rounded">npm run setup-google</code> to open Google Cloud Credentials and
           ensure <code className="bg-amber-100 px-1 rounded">.env</code> exists.
         </p>
+        <p className="text-xs text-amber-800/95 border-t border-amber-200/80 pt-2">
+          <strong>Cloud Shell:</strong> It runs in Google&apos;s cloud, not on your PC. <code className="bg-amber-100 px-1 rounded">gcloud config set project</code> only picks which GCP project you manage from that terminal—it does not write{' '}
+          <code className="bg-amber-100 px-1 rounded">frontend/.env</code> on your machine. Create the OAuth <strong>Web</strong> client in the Credentials page, copy the <strong>Client ID</strong>, and paste it into{' '}
+          <code className="bg-amber-100 px-1 rounded">frontend/.env</code> on the computer where you run{' '}
+          <code className="bg-amber-100 px-1 rounded">npm run dev</code> (your <code className="bg-amber-100 px-1 rounded">localhost:5173</code> app), then restart the dev server.
+        </p>
         <ol className="list-decimal list-inside space-y-1 text-amber-900/95">
           <li>
             In Google Cloud, open your OAuth 2.0 <strong>Web</strong> client and add{' '}
