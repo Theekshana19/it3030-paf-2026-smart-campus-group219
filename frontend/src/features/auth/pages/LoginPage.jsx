@@ -110,29 +110,27 @@ export default function LoginPage() {
               {!googleClientIdConfigured ? (
                 <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900 space-y-2">
                   <p className="font-semibold">Enable Google Sign-In locally</p>
+                  <p className="text-xs text-amber-900/90">
+                    From the <code className="bg-amber-100 px-1 rounded">frontend</code> folder run{' '}
+                    <code className="bg-amber-100 px-1 rounded">npm run setup-google</code> to open Google Cloud
+                    Credentials and ensure <code className="bg-amber-100 px-1 rounded">.env</code> exists.
+                  </p>
                   <ol className="list-decimal list-inside space-y-1 text-amber-900/95">
                     <li>
-                      Copy{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env.example</code> to{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code>.
+                      In Google Cloud, open your OAuth 2.0 <strong>Web</strong> client and add{' '}
+                      <strong>Authorized JavaScript origins</strong> for your dev URL (e.g.{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:5173</code>,{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">http://127.0.0.1:5173</code>, and{' '}
+                      <code className="text-xs">5174</code>/<code className="text-xs">5175</code> if needed).
                     </li>
                     <li>
-                      Set <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to your
-                      OAuth 2.0 <strong>Web client</strong> ID (ends in{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">.apps.googleusercontent.com</code>).
+                      Copy the <strong>Client ID</strong> into <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code> as{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID=…apps.googleusercontent.com</code>{' '}
+                      (one line, no quotes). Restart <code className="text-xs">npm run dev</code>.
                     </li>
                     <li>
-                      In Google Cloud Console → Credentials → that client → <strong>Authorized JavaScript origins</strong>
-                      , add the exact Vite URL you use (e.g.{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:5173</code>
-                      — add <code className="text-xs">5174</code>/<code className="text-xs">5175</code> if needed).
-                    </li>
-                    <li>
-                      Run the Spring Boot backend on port <strong>8080</strong> (Vite proxies{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">/api</code> there). Only set{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> if you are not
-                      using that proxy. Restart <code className="text-xs">npm run dev</code> after changing{' '}
-                      <code className="text-xs">.env</code>.
+                      Run Spring Boot on port <strong>8080</strong> so Vite can proxy <code className="text-xs bg-amber-100 px-1 rounded">/api</code> there (leave{' '}
+                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> unset unless you bypass the proxy).
                     </li>
                   </ol>
                 </div>
