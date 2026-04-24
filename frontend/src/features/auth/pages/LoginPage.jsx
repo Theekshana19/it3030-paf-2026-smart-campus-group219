@@ -22,7 +22,7 @@ function fieldClass(hasError) {
 export default function LoginPage() {
   const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState(googleClientIdConfigured ? 'google' : 'email');
+  const [mode, setMode] = useState('google');
 
   const {
     register,
@@ -71,56 +71,46 @@ export default function LoginPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Welcome back</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Sign in to manage campus resources</p>
 
-          <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
-            <button
-              type="button"
-              onClick={() => setMode('google')}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                mode === 'google'
-                  ? 'bg-white shadow-sm text-on-surface'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Google
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('email');
-                reset();
-              }}
-              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                mode === 'email'
-                  ? 'bg-white shadow-sm text-on-surface'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Email
-            </button>
-          </div>
+          {googleClientIdConfigured ? (
+            <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
+              <button
+                type="button"
+                onClick={() => setMode('google')}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  mode === 'google'
+                    ? 'bg-white shadow-sm text-on-surface'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                Google
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMode('email');
+                  reset();
+                }}
+                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  mode === 'email'
+                    ? 'bg-white shadow-sm text-on-surface'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                Email
+              </button>
+            </div>
+          ) : null}
 
-          {mode === 'google' ? (
-            <div className="space-y-3">
-              {!googleClientIdConfigured ? (
-                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900">
-                  Google Sign-In is not configured. Copy{' '}
-                  <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env.example</code> to{' '}
-                  <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code>, set{' '}
-                  <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> to your Web
-                  client ID from Google Cloud Console, then restart <code className="text-xs">npm run dev</code>.
-                </div>
-              ) : (
-                <div className="flex justify-center">
-                  <GoogleLogin
-                    onSuccess={handleGoogleSuccess}
-                    onError={() => toast.error('Google Sign-In failed. Please try again.')}
-                    theme="outline"
-                    size="large"
-                    shape="rectangular"
-                    width="280"
-                  />
-                </div>
-              )}
+          {googleClientIdConfigured && mode === 'google' ? (
+            <div className="flex justify-center mb-2">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => toast.error('Google Sign-In failed. Please try again.')}
+                theme="outline"
+                size="large"
+                shape="rectangular"
+                width="280"
+              />
             </div>
           ) : (
             <form onSubmit={onEmailLogin} className="space-y-4" noValidate>
