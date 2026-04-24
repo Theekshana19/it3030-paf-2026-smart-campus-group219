@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
+import GoogleSignInPanel from '../components/GoogleSignInPanel.jsx';
 import { loginEmailSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
-import { isGoogleOAuthConfigured } from '../../../config/googleClient.js';
 
 const inputClass =
   'w-full border border-outline-variant rounded-xl px-4 py-3 text-sm bg-surface-container-low outline-none focus:ring-2 focus:ring-primary/30 transition-all';
@@ -19,10 +18,9 @@ function fieldClass(hasError) {
 }
 
 export default function LoginPage() {
-  const { user, login, loginWithCredentials } = useAuth();
+  const { user, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const googleClientIdConfigured = isGoogleOAuthConfigured();
-  // Always start on Google tab so OAuth 2.0 sign-in (or setup steps) is visible first
+  // Default to Google (OAuth 2.0) tab so sign-in or setup steps are visible first
   const [mode, setMode] = useState('google');
 
   const {
@@ -39,14 +37,6 @@ export default function LoginPage() {
   useEffect(() => {
     if (user) navigate('/', { replace: true });
   }, [user, navigate]);
-
-  const handleGoogleSuccess = async ({ credential }) => {
-    try {
-      await login(credential);
-    } catch (err) {
-      toast.error(getErrorMessage(err) || 'Google Sign-In failed. Please try again.');
-    }
-  };
 
   const onEmailLogin = handleSubmit(async ({ email, password }) => {
     try {
@@ -107,48 +97,7 @@ export default function LoginPage() {
 
           {mode === 'google' ? (
             <div className="space-y-3">
-              {!googleClientIdConfigured ? (
-                <div className="rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-900 space-y-2">
-                  <p className="font-semibold">Enable Google Sign-In locally</p>
-                  <p className="text-xs text-amber-900/90">
-                    From the <code className="bg-amber-100 px-1 rounded">frontend</code> folder run{' '}
-                    <code className="bg-amber-100 px-1 rounded">npm run setup-google</code> to open Google Cloud
-                    Credentials and ensure <code className="bg-amber-100 px-1 rounded">.env</code> exists.
-                  </p>
-                  <ol className="list-decimal list-inside space-y-1 text-amber-900/95">
-                    <li>
-                      In Google Cloud, open your OAuth 2.0 <strong>Web</strong> client and add{' '}
-                      <strong>Authorized JavaScript origins</strong> for your dev URL (e.g.{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">http://localhost:5173</code>,{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">http://127.0.0.1:5173</code>, and{' '}
-                      <code className="text-xs">5174</code>/<code className="text-xs">5175</code> if needed).
-                    </li>
-                    <li>
-                      Copy the <strong>Client ID</strong> into <code className="text-xs bg-amber-100 px-1 rounded">frontend/.env</code> as{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID=…apps.googleusercontent.com</code>{' '}
-                      (one line, no quotes). Restart <code className="text-xs">npm run dev</code>.
-                    </li>
-                    <li>
-                      Run Spring Boot on port <strong>8080</strong> so Vite can proxy <code className="text-xs bg-amber-100 px-1 rounded">/api</code> there (leave{' '}
-                      <code className="text-xs bg-amber-100 px-1 rounded">VITE_API_BASE_URL</code> unset unless you bypass the proxy).
-                    </li>
-                  </ol>
-                </div>
-              ) : (
-                <div className="flex w-full flex-col items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-low/30 px-4 py-6">
-                  <p className="text-center text-xs font-medium text-on-surface-variant">Continue with Google</p>
-                  <div className="flex min-h-[44px] w-full max-w-[320px] justify-center items-center">
-                    <GoogleLogin
-                      onSuccess={handleGoogleSuccess}
-                      onError={() => toast.error('Google Sign-In failed. Please try again.')}
-                      theme="outline"
-                      size="large"
-                      shape="rectangular"
-                      width="280"
-                    />
-                  </div>
-                </div>
-              )}
+              <GoogleSignInPanel successMessage="Welcome back!" />
             </div>
           ) : (
             <form onSubmit={onEmailLogin} className="space-y-4" noValidate>

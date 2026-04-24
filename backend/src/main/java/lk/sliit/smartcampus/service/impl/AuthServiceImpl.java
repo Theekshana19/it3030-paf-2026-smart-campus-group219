@@ -15,8 +15,10 @@ import lk.sliit.smartcampus.service.AuthService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -32,13 +34,20 @@ public class AuthServiceImpl implements AuthService {
   private final JwtUtil jwtUtil;
   private final PasswordEncoder passwordEncoder;
   private final RestTemplate restTemplate;
+  /** When set, ID token {@code aud} must match (same Web client ID as the frontend). */
+  private final String googleOAuthWebClientId;
 
-  public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil,
-      PasswordEncoder passwordEncoder) {
+  public AuthServiceImpl(
+      UserRepository userRepository,
+      JwtUtil jwtUtil,
+      PasswordEncoder passwordEncoder,
+      @Value("${google.oauth.web-client-id:}") String googleOAuthWebClientId) {
     this.userRepository = userRepository;
     this.jwtUtil = jwtUtil;
     this.passwordEncoder = passwordEncoder;
     this.restTemplate = new RestTemplate();
+    this.googleOAuthWebClientId =
+        googleOAuthWebClientId != null ? googleOAuthWebClientId.trim() : "";
   }
 
   @Override
@@ -86,6 +95,14 @@ public class AuthServiceImpl implements AuthService {
       String sub = (String) claims.get("sub");
       if (sub == null || sub.isBlank()) {
         throw new UnauthorizedException("Invalid Google ID token: missing subject");
+      }
+
+      if (StringUtils.hasText(googleOAuthWebClientId)) {
+        Object aud = claims.get("aud");
+        String audStr = aud != null ? String.valueOf(aud) : "";
+        if (!googleOAuthWebClientId.equals(audStr)) {
+          throw new UnauthorizedException("Invalid Google ID token audience");
+        }
       }
 
       String email = (String) claims.getOrDefault("email", sub.toLowerCase(Locale.ROOT) + "@google.local");

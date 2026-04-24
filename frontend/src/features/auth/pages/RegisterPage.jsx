@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
+import GoogleSignInPanel from '../components/GoogleSignInPanel.jsx';
 import { registerSchema } from '../validation/authSchemas.js';
 import { getErrorMessage } from '../../../services/httpClient.js';
 
@@ -26,6 +27,7 @@ const defaultValues = {
 export default function RegisterPage() {
   const { user, register: registerUser } = useAuth();
   const navigate = useNavigate();
+  const [mode, setMode] = useState('google');
 
   const {
     register,
@@ -66,6 +68,46 @@ export default function RegisterPage() {
           <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Create account</h1>
           <p className="text-on-surface-variant text-sm text-center mb-6">Register to access the campus portal</p>
 
+          <p className="text-center text-xs text-on-surface-variant mb-4">
+            Sign up with <span className="font-semibold text-on-surface">Google (OAuth 2.0)</span> or register with
+            email and password.
+          </p>
+
+          <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
+            <button
+              type="button"
+              onClick={() => setMode('google')}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                mode === 'google'
+                  ? 'bg-white shadow-sm text-on-surface'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              Google (OAuth 2.0)
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode('email')}
+              className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                mode === 'email'
+                  ? 'bg-white shadow-sm text-on-surface'
+                  : 'text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              Email
+            </button>
+          </div>
+
+          {mode === 'google' ? (
+            <div className="space-y-3">
+              <GoogleSignInPanel
+                title="Sign up with Google"
+                successMessage="Welcome to SmartCampus! Signed in with Google."
+              />
+            </div>
+          ) : null}
+
+          {mode === 'email' ? (
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             <div>
               <label htmlFor="reg-name" className={labelClass}>
@@ -164,6 +206,7 @@ export default function RegisterPage() {
               {isSubmitting ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
+          ) : null}
 
           <p className="mt-6 text-center text-xs text-on-surface-variant">
             Already have an account?{' '}
