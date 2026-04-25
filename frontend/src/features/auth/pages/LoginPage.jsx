@@ -3,12 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
-import { getErrorMessage } from '../../../services/httpClient.js';
 
 export default function LoginPage() {
   const { user, login, loginWithCredentials } = useAuth();
   const navigate = useNavigate();
-  const [mode, setMode] = useState('google');
+  const [mode, setMode] = useState('google'); // 'google' | 'email'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -20,8 +19,8 @@ export default function LoginPage() {
   const handleGoogleSuccess = async ({ credential }) => {
     try {
       await login(credential);
-    } catch (err) {
-      toast.error(getErrorMessage(err) || 'Google Sign-In failed. Please try again.');
+    } catch {
+      toast.error('Google Sign-In failed. Please try again.');
     }
   };
 
@@ -32,7 +31,8 @@ export default function LoginPage() {
     try {
       await loginWithCredentials({ email, password });
     } catch (err) {
-      toast.error(getErrorMessage(err) || 'Invalid email or password.');
+      const msg = err?.response?.data?.message || 'Invalid email or password.';
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -44,6 +44,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
@@ -53,10 +54,16 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-outline-variant p-8">
-          <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Welcome back</h1>
-          <p className="text-on-surface-variant text-sm text-center mb-6">Sign in to manage campus resources</p>
+          <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">
+            Welcome back
+          </h1>
+          <p className="text-on-surface-variant text-sm text-center mb-6">
+            Sign in to manage campus resources
+          </p>
 
+          {/* Mode toggle */}
           <div className="flex rounded-xl bg-surface-container-low p-1 mb-6">
             <button
               type="button"
@@ -96,10 +103,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleEmailLogin} className="space-y-4" noValidate>
               <div>
-                <label
-                  htmlFor="login-email"
-                  className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-                >
+                <label htmlFor="login-email" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                   Email
                 </label>
                 <input
@@ -114,10 +118,7 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label
-                  htmlFor="login-password"
-                  className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-                >
+                <label htmlFor="login-password" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                   Password
                 </label>
                 <input
@@ -126,7 +127,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={inputClass}
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="••••••••"
                   autoComplete="current-password"
                   required
                 />
@@ -136,7 +137,7 @@ export default function LoginPage() {
                 disabled={submitting || !email || !password}
                 className="w-full py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm shadow hover:opacity-90 transition-all disabled:opacity-50"
               >
-                {submitting ? 'Signing inâ€¦' : 'Sign In'}
+                {submitting ? 'Signing in…' : 'Sign In'}
               </button>
             </form>
           )}

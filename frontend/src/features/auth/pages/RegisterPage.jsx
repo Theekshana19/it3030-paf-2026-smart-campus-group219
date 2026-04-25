@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuth } from '../hooks/useAuth';
-import { getErrorMessage } from '../../../services/httpClient.js';
 
 export default function RegisterPage() {
   const { user, register } = useAuth();
@@ -32,7 +31,8 @@ export default function RegisterPage() {
       await register({ displayName, email, password });
       toast.success('Account created! Welcome to SmartCampus.');
     } catch (err) {
-      toast.error(getErrorMessage(err) || 'Registration failed. Please try again.');
+      const msg = err?.response?.data?.message || 'Registration failed. Please try again.';
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -44,6 +44,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-surface flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
+        {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
@@ -53,16 +54,18 @@ export default function RegisterPage() {
           </div>
         </div>
 
+        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-outline-variant p-8">
-          <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">Create account</h1>
-          <p className="text-on-surface-variant text-sm text-center mb-6">Register to access the campus portal</p>
+          <h1 className="font-headline font-bold text-2xl text-on-surface mb-1 text-center">
+            Create account
+          </h1>
+          <p className="text-on-surface-variant text-sm text-center mb-6">
+            Register to access the campus portal
+          </p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
-              <label
-                htmlFor="reg-name"
-                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-              >
+              <label htmlFor="reg-name" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                 Full Name
               </label>
               <input
@@ -78,10 +81,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="reg-email"
-                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-              >
+              <label htmlFor="reg-email" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                 Email
               </label>
               <input
@@ -97,10 +97,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="reg-password"
-                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-              >
+              <label htmlFor="reg-password" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                 Password
               </label>
               <input
@@ -116,10 +113,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="reg-confirm"
-                className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5"
-              >
+              <label htmlFor="reg-confirm" className="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1.5">
                 Confirm Password
               </label>
               <input
@@ -139,7 +133,7 @@ export default function RegisterPage() {
               disabled={submitting || !displayName || !email || !password || !confirm}
               className="w-full py-3 rounded-xl bg-primary text-on-primary font-semibold text-sm shadow hover:opacity-90 transition-all disabled:opacity-50"
             >
-              {submitting ? 'Creating accountâ€¦' : 'Create Account'}
+              {submitting ? 'Creating account…' : 'Create Account'}
             </button>
           </form>
 

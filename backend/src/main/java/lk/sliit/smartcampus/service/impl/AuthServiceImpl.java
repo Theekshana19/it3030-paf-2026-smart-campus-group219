@@ -56,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
     User user =
         userRepository
             .findByGoogleSub(tokenInfo.sub())
+            .or(() -> userRepository.findByEmailIgnoreCase(tokenInfo.email()))
             .map(existing -> updateExistingUser(existing, tokenInfo))
             .orElseGet(() -> createNewUser(tokenInfo));
     User saved = userRepository.save(user);
@@ -152,6 +153,8 @@ public class AuthServiceImpl implements AuthService {
     LocalDateTime now = LocalDateTime.now();
     User user = User.builder()
         .email(email)
+        // SQL Server unique constraints treat NULL as a value; avoid duplicate NULL google_sub.
+        .googleSub("local:" + email)
         .displayName(request.getDisplayName())
         .passwordHash(passwordEncoder.encode(request.getPassword()))
         .role(UserRole.USER)
