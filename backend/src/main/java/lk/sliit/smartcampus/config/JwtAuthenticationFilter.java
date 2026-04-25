@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import lk.sliit.smartcampus.entity.User;
 import lk.sliit.smartcampus.repository.UserRepository;
@@ -35,16 +36,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     if (token != null && jwtUtil.validateToken(token)) {
       Long userId = jwtUtil.extractUserId(token);
-      userRepository.findById(userId).ifPresent(user -> setAuthentication(user, token));
+      userRepository.findById(userId).ifPresent(this::setAuthentication);
     }
 
     chain.doFilter(request, response);
   }
 
-  private void setAuthentication(User user, String token) {
-    String role = jwtUtil.extractRole(token).name();
-    var authority = new SimpleGrantedAuthority("ROLE_" + role);
-    var auth = new UsernamePasswordAuthenticationToken(user, null, List.of(authority));
+  private void setAuthentication(User user) {
+    List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
+    user.getRole().getPermissions()
+        .forEach(p -> authorities.add(new SimpleGrantedAuthority(p.getCode())));
+
+    var auth = new UsernamePasswordAuthenticationToken(user, null, authorities);
     SecurityContextHolder.getContext().setAuthentication(auth);
   }
 
