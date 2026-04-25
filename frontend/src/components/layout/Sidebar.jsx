@@ -1,6 +1,8 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Icon from '../common/Icon.jsx';
 import { useAuth } from '../../features/auth/hooks/useAuth.js';
+import { usePermission } from '../../features/auth/hooks/usePermission.js';
+import { PERMISSIONS } from '../../features/auth/utils/permissions.js';
 
 const navItemClass =
   'text-slate-300 hover:text-white flex items-center px-4 py-3 mx-2 my-1 transition-all hover:bg-[#4F46E5]/20 cursor-pointer rounded-lg group';
@@ -61,9 +63,9 @@ function dashboardNavActive({ pathname }) {
 }
 
 export default function Sidebar() {
-  const { user, logout } = useAuth();
+     const { logout } = useAuth();
+  const { hasPermission } = usePermission();
   const navigate = useNavigate();
-  const isAdmin = user?.role === 'ADMIN';
 
   const handleLogout = () => {
     logout();
@@ -83,40 +85,56 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1">
-        <NavItem to="/dashboard" icon="dashboard" label="Dashboard" isCustomActive={dashboardNavActive} />
-        <NavItem
-          to="/resources"
-          icon="inventory_2"
-          label="Resources Catalogue"
-          isCustomActive={catalogueNavActive}
-        />
-        {isAdmin && (
+        <NavItem to="/" icon="dashboard" label="Dashboard" end />
+       {hasPermission(PERMISSIONS.RESOURCE_VIEW) && (
+          <NavItem
+            to="/resources"
+            icon="inventory_2"
+            label="Resources Catalogue"
+            isCustomActive={catalogueNavActive}
+          />
+        )}
+        {hasPermission(PERMISSIONS.RESOURCE_VIEW) && (
+          <NavItem
+            to="/resources"
+            icon="calendar_today"
+            label="Status Scheduling"
+            isCustomActive={schedulingNavActive}
+          />
+        )}
+        {hasPermission(PERMISSIONS.RESOURCE_CREATE) && (
           <NavItem to="/resources/new" icon="add_circle" label="Add Resource" />
         )}
-        <NavItem
-          to="/bookings"
-          icon="event_note"
-          label="Bookings"
-          isCustomActive={bookingsNavActive}
-        />
-        <NavItem
-          to="/tickets"
-          icon="confirmation_number"
-          label="Incident Tickets"
-          isCustomActive={ticketsNavActive}
-        />
-        <NavItem
-          to="/status-scheduling"
-          icon="calendar_today"
-          label="Status Scheduling"
-          isCustomActive={schedulingNavActive}
-        />
-        <NavItem
-          to="/tag-management"
-          icon="sell"
-          label="Tag Management"
-          isCustomActive={tagManagementNavActive}
-        />
+
+        {hasPermission(PERMISSIONS.BOOKING_VIEW) && (
+          <NavItem
+            to="/bookings"
+            icon="event_note"
+            label="Bookings"
+            isCustomActive={bookingsNavActive}
+          />
+        )}
+
+        {hasPermission(PERMISSIONS.TICKET_VIEW) && (
+          <NavItem
+            to="/tickets"
+            icon="confirmation_number"
+            label="Incident Tickets"
+            isCustomActive={ticketsNavActive}
+          />
+        )}
+
+        {hasPermission(PERMISSIONS.RESOURCE_CREATE) && (
+          <NavItem to="/tags" icon="sell" label="Tag Management" />
+        )}
+
+        {hasPermission(PERMISSIONS.USER_VIEW) && (
+          <NavItem to="/users" icon="people" label="User Management" />
+        )}
+        {hasPermission(PERMISSIONS.ROLE_VIEW) && (
+          <NavItem to="/roles" icon="shield" label="Role Management" />
+        )}
+        <NavItem to="/settings" icon="settings" label="Settings" />
       </nav>
 
       <div className="mt-auto px-4 py-4 bg-[#4a5568]/30 mx-2 rounded-xl mb-4 text-center">

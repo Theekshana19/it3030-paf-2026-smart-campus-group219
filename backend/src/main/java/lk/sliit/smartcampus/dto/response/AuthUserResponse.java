@@ -1,7 +1,7 @@
 package lk.sliit.smartcampus.dto.response;
 
 import java.time.LocalDateTime;
-import lk.sliit.smartcampus.enums.UserRole;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -14,10 +14,10 @@ public class AuthUserResponse {
   private String email;
   private String displayName;
   private String profileImageUrl;
-  private UserRole role;
+  private String role;
+  private List<String> permissions;
   private Boolean isActive;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
   private String token;
 }
-

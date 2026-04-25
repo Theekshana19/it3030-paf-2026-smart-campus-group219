@@ -1,7 +1,13 @@
+import PropTypes from 'prop-types';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
-export default function ProtectedRoute({ allowedRoles }) {
+/**
+ * allowedRoles      – user.role must be one of these strings
+ * requiredPermission – user.permissions must include this code
+ * requireAny        – user.permissions must include at least one of these codes
+ */
+export default function ProtectedRoute({ allowedRoles, requiredPermission, requireAny }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -18,5 +24,21 @@ export default function ProtectedRoute({ allowedRoles }) {
     return <Navigate to="/" replace />;
   }
 
+  const perms = user?.permissions ?? [];
+
+  if (requiredPermission && !perms.includes(requiredPermission)) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireAny && !requireAny.some((p) => perms.includes(p))) {
+    return <Navigate to="/" replace />;
+  }
+
   return <Outlet />;
 }
+
+ProtectedRoute.propTypes = {
+  allowedRoles: PropTypes.arrayOf(PropTypes.string),
+  requiredPermission: PropTypes.string,
+  requireAny: PropTypes.arrayOf(PropTypes.string),
+};

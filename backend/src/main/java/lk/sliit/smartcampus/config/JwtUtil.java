@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import lk.sliit.smartcampus.entity.User;
-import lk.sliit.smartcampus.enums.UserRole;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,7 +26,7 @@ public class JwtUtil {
     return Jwts.builder()
         .subject(String.valueOf(user.getUserId()))
         .claim("email", user.getEmail())
-        .claim("role", user.getRole().name())
+        .claim("role", user.getRole().getName())
         .issuedAt(new Date(now))
         .expiration(new Date(now + expirationMs))
         .signWith(signingKey)
@@ -47,9 +46,8 @@ public class JwtUtil {
     return Long.valueOf(parseClaims(token).getSubject());
   }
 
-  public UserRole extractRole(String token) {
-    String role = parseClaims(token).get("role", String.class);
-    return UserRole.valueOf(role);
+  public String extractRole(String token) {
+    return parseClaims(token).get("role", String.class);
   }
 
   private Claims parseClaims(String token) {

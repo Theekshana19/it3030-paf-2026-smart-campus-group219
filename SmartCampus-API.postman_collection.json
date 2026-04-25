@@ -130,10 +130,136 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"role\": \"ADMIN\"\n}",
+              "raw": "{\n  \"roleId\": 2\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": { "raw": "{{baseUrl}}/api/users/1/role", "host": ["{{baseUrl}}"], "path": ["api","users","1","role"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Roles",
+      "description": "Dynamic role management. All endpoints require ADMIN role.",
+      "item": [
+        {
+          "name": "List All Roles",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api","roles"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/roles/1", "host": ["{{baseUrl}}"], "path": ["api","roles","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MANAGER\",\n  \"description\": \"Campus manager with elevated access\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/roles", "host": ["{{baseUrl}}"], "path": ["api","roles"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MANAGER\",\n  \"description\": \"Updated description\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/roles/4", "host": ["{{baseUrl}}"], "path": ["api","roles","4"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Role (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/roles/4", "host": ["{{baseUrl}}"], "path": ["api","roles","4"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Permissions to Role (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissionIds\": [1, 2, 3, 5]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/roles/4/permissions", "host": ["{{baseUrl}}"], "path": ["api","roles","4","permissions"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Permission from Role (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/roles/4/permissions/3", "host": ["{{baseUrl}}"], "path": ["api","roles","4","permissions","3"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
+    {
+      "name": "Permissions",
+      "description": "Permission management. All endpoints require ADMIN role.\n\nSeeded permission codes:\nRESOURCE_VIEW, RESOURCE_CREATE, RESOURCE_UPDATE, RESOURCE_DELETE\nBOOKING_VIEW, BOOKING_CREATE, BOOKING_CANCEL\nTICKET_VIEW, TICKET_CREATE, TICKET_UPDATE\nUSER_VIEW, USER_MANAGE",
+      "item": [
+        {
+          "name": "List All Permissions",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api","permissions"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Permission by ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/permissions/1", "host": ["{{baseUrl}}"], "path": ["api","permissions","1"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Permission (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"REPORT_EXPORT\",\n  \"description\": \"Export reports to PDF/CSV\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{baseUrl}}/api/permissions", "host": ["{{baseUrl}}"], "path": ["api","permissions"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Permission (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/permissions/13", "host": ["{{baseUrl}}"], "path": ["api","permissions","13"] }
           },
           "response": []
         }
