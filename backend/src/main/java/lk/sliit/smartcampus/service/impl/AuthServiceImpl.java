@@ -7,9 +7,10 @@ import lk.sliit.smartcampus.config.JwtUtil;
 import lk.sliit.smartcampus.dto.request.LoginRequest;
 import lk.sliit.smartcampus.dto.request.RegisterRequest;
 import lk.sliit.smartcampus.dto.response.AuthUserResponse;
+import lk.sliit.smartcampus.entity.Role;
 import lk.sliit.smartcampus.entity.User;
-import lk.sliit.smartcampus.enums.UserRole;
 import lk.sliit.smartcampus.exception.UnauthorizedException;
+import lk.sliit.smartcampus.repository.RoleRepository;
 import lk.sliit.smartcampus.repository.UserRepository;
 import lk.sliit.smartcampus.service.AuthService;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,17 +26,18 @@ import org.springframework.web.client.RestTemplate;
 @Transactional
 public class AuthServiceImpl implements AuthService {
 
-  private static final String GOOGLE_TOKENINFO_URL =
-      "https://oauth2.googleapis.com/tokeninfo?id_token={token}";
+  private static final String GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo?id_token={token}";
 
   private final UserRepository userRepository;
+  private final RoleRepository roleRepository;
   private final JwtUtil jwtUtil;
   private final PasswordEncoder passwordEncoder;
   private final RestTemplate restTemplate;
 
-  public AuthServiceImpl(UserRepository userRepository, JwtUtil jwtUtil,
-      PasswordEncoder passwordEncoder) {
+  public AuthServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
+      JwtUtil jwtUtil, PasswordEncoder passwordEncoder) {
     this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
     this.jwtUtil = jwtUtil;
     this.passwordEncoder = passwordEncoder;
     this.restTemplate = new RestTemplate();
@@ -44,11 +46,10 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public AuthUserResponse authenticateWithGoogle(String googleToken) {
     GoogleTokenInfo tokenInfo = verifyGoogleToken(googleToken);
-    User user =
-        userRepository
-            .findByGoogleSub(tokenInfo.sub())
-            .map(existing -> updateExistingUser(existing, tokenInfo))
-            .orElseGet(() -> createNewUser(tokenInfo));
+    User user = userRepository
+        .findByGoogleSub(tokenInfo.sub())
+        .map(existing -> updateExistingUser(existing, tokenInfo))
+        .orElseGet(() -> createNewUser(tokenInfo));
     User saved = userRepository.save(user);
     String jwt = jwtUtil.generateToken(saved);
     return toResponse(saved, jwt);
@@ -58,10 +59,9 @@ public class AuthServiceImpl implements AuthService {
   @Transactional(readOnly = true)
   public AuthUserResponse getCurrentUser(String googleToken) {
     GoogleTokenInfo tokenInfo = verifyGoogleToken(googleToken);
-    User user =
-        userRepository
-            .findByGoogleSub(tokenInfo.sub())
-            .orElseThrow(() -> new UnauthorizedException("User not found"));
+    User user = userRepository
+        .findByGoogleSub(tokenInfo.sub())
+        .orElseThrow(() -> new UnauthorizedException("User not found"));
     String jwt = jwtUtil.generateToken(user);
     return toResponse(user, jwt);
   }
@@ -75,7 +75,8 @@ public class AuthServiceImpl implements AuthService {
           GOOGLE_TOKENINFO_URL,
           HttpMethod.GET,
           null,
-          new ParameterizedTypeReference<Map<String, Object>>() {},
+          new ParameterizedTypeReference<Map<String, Object>>() {
+          },
           googleToken);
 
       Map<String, Object> claims = response.getBody();
@@ -98,6 +99,11 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
+  private Role defaultUserRole() {
+    return roleRepository.findByName("USER")
+        .orElseThrow(() -> new IllegalStateException("Default USER role not found in database"));
+  }
+
   private User createNewUser(GoogleTokenInfo info) {
     LocalDateTime now = LocalDateTime.now();
     return User.builder()
@@ -105,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
         .email(info.email())
         .displayName(info.displayName())
         .profileImageUrl(info.profileImageUrl())
-        .role(UserRole.USER)
+        .role(defaultUserRole())
         .isActive(true)
         .createdAt(now)
         .updatedAt(now)
@@ -118,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
     existing.setProfileImageUrl(info.profileImageUrl());
     existing.setUpdatedAt(LocalDateTime.now());
     if (existing.getRole() == null) {
-      existing.setRole(UserRole.USER);
+      existing.setRole(defaultUserRole());
     }
     if (existing.getIsActive() == null) {
       existing.setIsActive(true);
@@ -137,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
         .email(email)
         .displayName(request.getDisplayName())
         .passwordHash(passwordEncoder.encode(request.getPassword()))
-        .role(UserRole.USER)
+        .role(defaultUserRole())
         .isActive(true)
         .createdAt(now)
         .updatedAt(now)
@@ -175,7 +181,10 @@ public class AuthServiceImpl implements AuthService {
         .email(user.getEmail())
         .displayName(user.getDisplayName())
         .profileImageUrl(user.getProfileImageUrl())
-        .role(user.getRole())
+        .role(user.getRole().getName())
+        .permissions(user.getRole().getPermissions().stream()
+            .map(lk.sliit.smartcampus.entity.Permission::getCode)
+            .toList())
         .isActive(user.getIsActive())
         .createdAt(user.getCreatedAt())
         .updatedAt(user.getUpdatedAt())
@@ -184,5 +193,6 @@ public class AuthServiceImpl implements AuthService {
   }
 
   private record GoogleTokenInfo(
-      String sub, String email, String displayName, String profileImageUrl) {}
+      String sub, String email, String displayName, String profileImageUrl) {
+  }
 }

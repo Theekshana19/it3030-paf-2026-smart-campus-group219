@@ -7,10 +7,18 @@ import { useNotifications } from '../../features/notifications/hooks/useNotifica
 import NotificationPanel from '../../features/notifications/components/NotificationPanel.jsx';
 
 const ROLE_BADGE = {
-  ADMIN: { label: 'Admin', cls: 'bg-primary/10 text-primary' },
-  TECHNICIAN: { label: 'Tech', cls: 'bg-tertiary/10 text-tertiary' },
-  USER: { label: 'User', cls: 'bg-secondary/10 text-secondary' },
+  ADMIN:      { label: 'Admin', cls: 'bg-primary/10 text-primary' },
+  TECHNICIAN: { label: 'Tech',  cls: 'bg-tertiary/10 text-tertiary' },
+  USER:       { label: 'User',  cls: 'bg-secondary/10 text-secondary' },
 };
+
+function getRoleBadge(role) {
+  if (!role) return null;
+  if (ROLE_BADGE[role]) return ROLE_BADGE[role];
+  // Dynamic role: generate a neutral badge using the role name
+  const label = role.length > 10 ? role.slice(0, 9) + '…' : role;
+  return { label, cls: 'bg-surface-container text-on-surface-variant' };
+}
 
 function UserAvatar({ user }) {
   if (user?.profileImageUrl) {
@@ -92,7 +100,7 @@ export default function TopHeader() {
     navigate('/login', { replace: true });
   };
 
-  const badge = user?.role ? ROLE_BADGE[user.role] ?? ROLE_BADGE.USER : null;
+  const badge = getRoleBadge(user?.role);
 
   return (
     <header className="bg-[#f6fafe] shadow-[0_32px_32px_-4px_rgba(23,28,31,0.06)] flex justify-between items-center w-full px-8 py-4 sticky top-0 z-40">

@@ -1,4 +1,6 @@
+import PropTypes from 'prop-types';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { PERMISSIONS } from '../features/auth/utils/permissions.js';
 import DashboardLayout from '../layouts/DashboardLayout.jsx';
 import ProtectedRoute from '../features/auth/components/ProtectedRoute.jsx';
 import LoginPage from '../features/auth/pages/LoginPage.jsx';
@@ -18,6 +20,8 @@ import TicketDetailsPage from '../features/tickets/pages/TicketDetailsPage.jsx';
 import EditTicketPage from '../features/tickets/pages/EditTicketPage.jsx';
 import StatusSchedulingOverviewPage from '../features/scheduling/pages/StatusSchedulingOverviewPage.jsx';
 import TagManagementPage from '../features/tags/pages/TagManagementPage.jsx';
+import UserManagementPage from '../features/users/pages/UserManagementPage.jsx';
+import RoleManagementPage from '../features/roles/pages/RoleManagementPage.jsx';
 import DashboardPage from '../features/dashboard/pages/DashboardPage.jsx';
 
 function PlaceholderPage({ title }) {
@@ -30,7 +34,7 @@ function PlaceholderPage({ title }) {
     </div>
   );
 }
-
+PlaceholderPage.propTypes = { title: PropTypes.string.isRequired };
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/register', element: <RegisterPage /> },
@@ -50,7 +54,7 @@ export const router = createBrowserRouter([
             handle: { crumb: 'Facilities Catalogue' },
           },
           {
-            element: <ProtectedRoute allowedRoles={['ADMIN']} />,
+            element: <ProtectedRoute requiredPermission={PERMISSIONS.RESOURCE_CREATE} />,
             children: [
               {
                 path: 'resources/new',
@@ -133,6 +137,29 @@ export const router = createBrowserRouter([
             path: 'tags',
             element: <Navigate to="/tag-management" replace />,
             handle: { crumb: 'Campus Tag Manager' },
+          },
+          // User management — requires VIEW_USERS permission
+          {
+            element: <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_USERS} />,
+            children: [
+              {
+                path: 'users',
+                element: <UserManagementPage />,
+                handle: { crumb: 'User Management' },
+              },
+            ],
+          },
+
+          // Role management — requires VIEW_ROLES permission
+          {
+            element: <ProtectedRoute requiredPermission={PERMISSIONS.VIEW_ROLES} />,
+            children: [
+              {
+                path: 'roles',
+                element: <RoleManagementPage />,
+                handle: { crumb: 'Role Management' },
+              },
+            ],
           },
           {
             path: 'settings',
