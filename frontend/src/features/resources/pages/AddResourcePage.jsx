@@ -79,7 +79,7 @@ export default function AddResourcePage() {
           reset({ ...defaultValues });
           setSelectedTags([]);
         } else {
-          navigate('/resources');
+          navigate('/dashboard');
         }
         return true;
       } catch (e) {

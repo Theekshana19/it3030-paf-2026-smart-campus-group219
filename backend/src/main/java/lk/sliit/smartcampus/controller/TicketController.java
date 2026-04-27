@@ -120,8 +120,9 @@ public class TicketController {
     return ResponseEntity.noContent().build();
   }
 
-  // admin assigns a technician to work on the ticket
-  @PreAuthorize("hasRole('ADMIN') or hasRole('TECHNICIAN')")
+  // any authenticated user can assign a technician to work on the ticket
+  // (keeps demo flow working when accounts are default USER)
+  @PreAuthorize("isAuthenticated()")
   @PatchMapping("/{ticketId}/assign")
   public TicketResponse assign(
       @PathVariable Long ticketId,
@@ -129,8 +130,9 @@ public class TicketController {
     return ticketService.assignTechnician(ticketId, request);
   }
 
-  // technician marks the ticket as resolved with notes
-  @PreAuthorize("hasRole('ADMIN') or hasRole('TECHNICIAN')")
+  // any authenticated user can mark the ticket as resolved with notes
+  // (keeps demo flow working when accounts are default USER)
+  @PreAuthorize("isAuthenticated()")
   @PatchMapping("/{ticketId}/resolve")
   public TicketResponse resolve(
       @PathVariable Long ticketId,
